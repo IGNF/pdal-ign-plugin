@@ -1,0 +1,11 @@
+name: pdal_ign_plugin
+channels:
+  - conda-forge
+dependencies:
+  - pdal
+  - python-pdal
+  - pytest
+  - pytest-dependency
+  - black
+  - isort
+
