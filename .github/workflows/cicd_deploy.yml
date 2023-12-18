@@ -33,7 +33,7 @@ jobs:
       run: conda info
 
     - name: find_conda_sh
-      run: source /usr/share/miniconda/etc/conda/etc/profile.d/conda.sh
+      run: source /usr/share/miniconda/etc/profile.d/conda.sh
     
     - name: compil_plugins
       run: source ./ci/build.sh
