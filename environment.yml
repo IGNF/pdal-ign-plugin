@@ -5,7 +5,10 @@ dependencies:
   - pdal
   - python-pdal
   - pytest
-  - pytest-dependency
   - black
   - isort
+  - shapely
+  - pip:
+    - ign-pdal-tools
+
 

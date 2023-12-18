@@ -10,8 +10,6 @@
 #include <pdal/PointView.hpp>
 #include <pdal/StageFactory.hpp>
 
-#include <pdal/private/gdal/GDALUtils.hpp>
-
 #include <sstream>
 #include <cstdarg>
 
@@ -25,7 +23,7 @@ static StaticPluginInfo const s_info
     "",
 };
 
-CREATE_STATIC_STAGE(GridDecimationFilter, s_info)
+CREATE_SHARED_STAGE(GridDecimationFilter, s_info)
 
 std::string GridDecimationFilter::getName() const { return s_info.name; }
 
@@ -42,6 +40,8 @@ void GridDecimationFilter::addArgs(ProgramArgs& args)
     args.add("resolution", "Cell edge size, in units of X/Y",m_args->m_edgeLength, 1.);
     args.add("output_type", "Point keept into the cells ('min', 'max')", m_args->m_methodKeep, "max" );
     args.add("output_name_attribut", "Name of the add attribut", m_args->m_nameAddAttribut, "grid" );
+    args.add("output_wkt", "Export the grid as wkt", m_args->m_nameWktgrid, "" );
+
 }
 
 void GridDecimationFilter::initialize()
@@ -116,9 +116,24 @@ void GridDecimationFilter::createGrid(BOX2D bounds)
     int width = static_cast<int>(d_width);
     int height = static_cast<int>(d_height);
     
-    for (size_t l(0); l<d_height; l++)
-        for (size_t c(0); c<d_width; c++)
+    std::vector<Polygon> vgrid;
+    
+    for (size_t l(0); l<height; l++)
+        for (size_t c(0); c<width; c++)
+        {
+            BOX2D bounds_dalle ( bounds.minx + c*m_args->m_edgeLength, bounds.miny + l*m_args->m_edgeLength,
+                                bounds.minx + (c+1)*m_args->m_edgeLength, bounds.miny + (l+1)*m_args->m_edgeLength );
+            vgrid.push_back(Polygon(bounds_dalle));
             this->grid.insert( std::make_pair( std::make_pair(c,l), -1)  );
+        }
+
+    if (!m_args->m_nameWktgrid.empty())
+    {
+        std::ofstream oss (m_args->m_nameWktgrid);
+        for (auto pol : vgrid)
+            oss << pol.wkt() << std::endl;
+    }
+    
 }
 
 PointViewSet GridDecimationFilter::run(PointViewPtr view)
@@ -126,7 +141,7 @@ PointViewSet GridDecimationFilter::run(PointViewPtr view)
     BOX2D bounds;
     view->calculateBounds(bounds);
     createGrid(bounds);
-        
+    
     for (PointId i = 0; i < view->size(); ++i)
     {
         PointRef point = view->point(i);

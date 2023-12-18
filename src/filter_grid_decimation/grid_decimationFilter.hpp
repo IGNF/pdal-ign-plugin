@@ -33,6 +33,7 @@ private:
         std::string m_methodKeep; // type of output (min, max)
         double m_edgeLength; // lenght of grid
         std::string m_nameAddAttribut; // name of the new attribut
+        std::string m_nameWktgrid; // export wkt grid
         Dimension::Id m_dim;
     };
     
