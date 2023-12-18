@@ -29,7 +29,7 @@ jobs:
         environment-file: ./environment.yml
         auto-activate-base: true
 
-    - name: compil
+    - name: compil_plugins
       run: source ./ci/build.sh
 
     - name: Login to Docker Hub
