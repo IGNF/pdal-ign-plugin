@@ -30,7 +30,7 @@ jobs:
         auto-activate-base: true
 
     - name: find_conda_sh
-      run: source $CONDA_PREFX/etc/profile.d/conda.sh
+      run: source $CONDA_PREFIX/etc/profile.d/conda.sh
     
     - name: compil_plugins
       run: source ./ci/build.sh
