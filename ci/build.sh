@@ -7,9 +7,9 @@ then
 elif [ -e ~/miniconda3/etc/profile.d/conda.sh ]
 then
     source ~/miniconda3/etc/profile.d/conda.sh
-elif [ -e ~/miniconda/etc/profile.d/conda.sh ]
+elif [ -e /usr/share/miniconda/etc/profile.d/conda.sh ]
 then
-    source ~/miniconda/etc/profile.d/conda.sh
+    source /usr/share/miniconda/etc/profile.d/conda.sh
 elif [ -e ~/miniforge3/etc/profile.d/conda.sh ] 
 then    
      source ~/miniforge3/etc/profile.d/conda.sh
