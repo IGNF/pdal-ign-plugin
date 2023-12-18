@@ -15,8 +15,9 @@ This example transform highest points of classification 5 in classification 9, o
      "file-input.las",
     {
         "type": "filters.gridDecimation",
-		"output_type":"max",
-        "output_name_attribut": "grid"
+	"output_type":"max",
+        "output_name_attribut": "grid",
+	"output_wkt":"file-output.wkt"
     },
     {
           "type":"writers.las",
@@ -35,3 +36,5 @@ Options
   The resolution of the cells in meter. [Default: 1.]
 
 **output_name_attribut**: The name of the new attribut. [Default: grid]
+
+**output_wkt**: the name of the export grid file as wkt polygon. If none, no export [Default:""]
