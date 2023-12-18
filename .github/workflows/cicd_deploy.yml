@@ -29,8 +29,10 @@ jobs:
         environment-file: ./environment.yml
         auto-activate-base: true
 
+    - name: conda_info
+      run: conda info
+
     - name: find_conda_sh
-      #run: conda info
       run: source /usr/share/miniconda/etc/conda/etc/profile.d/conda.sh
     
     - name: compil_plugins
