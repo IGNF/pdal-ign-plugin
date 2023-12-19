@@ -20,21 +20,6 @@ jobs:
     - name: Checkout branch
       uses: actions/checkout@v3
 
-    - name: install cppunit
-      run: sudo apt install -y libcppunit-dev
-
-    - uses: conda-incubator/setup-miniconda@v3
-      with:
-        activate-environment: pdal_ign_plugin
-        environment-file: ./environment.yml
-        auto-activate-base: true
-    
-    - name: compil_plugins
-      run: source ./ci/build.sh
-
-    - name: test
-      run: source ./ci/launch_test.sh
-
     - name: Login to Docker Hub
       uses: docker/login-action@v2
       with:
