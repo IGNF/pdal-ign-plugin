@@ -10,7 +10,6 @@ This example transform highest points of classification 5 in classification 9, o
 
 
 ```
-.. code-block:: json
   [
      "file-input.las",
     {
