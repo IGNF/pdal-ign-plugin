@@ -28,7 +28,7 @@ export CONDA_PREFIX=$CONDA_PREFIX
 mkdir build
 cd build
 cmake -G"Unix Makefiles" -DCONDA_PREFIX=$CONDA_PREFIX -DCMAKE_BUILD_TYPE=Release ../ 
-make $1 install
+make install
 
 conda deactivate
 
