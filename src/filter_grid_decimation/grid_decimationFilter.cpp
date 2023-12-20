@@ -63,6 +63,9 @@ void GridDecimationFilter::ready(PointTableRef table)
     
     if (m_args->m_nameAddAttribut.empty())
         throwError("The output_name_attribut must be given.");
+    
+    if (!m_args->m_nameWktgrid.empty())
+        std::remove(m_args->m_nameWktgrid.c_str());
 }
 
 void GridDecimationFilter::addDimensions(PointLayoutPtr layout)
