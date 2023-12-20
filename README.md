@@ -10,7 +10,7 @@ run ci/build.sh
 
 ### Windows 
 
-todo...
+one day, maybe...
 
 ## Architecture of the code
 
