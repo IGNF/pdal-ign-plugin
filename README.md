@@ -64,7 +64,7 @@ The code should respect the documentation purpose by pdal : [build a pdal plugin
 The CMakeList should contains : 
 
 ```
-file( GLOB_RECURSE GD_SRCS ${CMAKE_SOURCE_DIR} src/my_new_PI/*.*)
+file( GLOB_RECURSE GD_SRCS ${CMAKE_SOURCE_DIR} *)
 
 PDAL_CREATE_PLUGIN(
     TYPE filter
