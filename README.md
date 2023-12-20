@@ -23,7 +23,7 @@ The code is structured as :
 │   │   ├── plufinFilter.h
 │   │   ├── CMakeLisits.txt
 ├── doc
-│   ├── plufinFilter.md
+│   ├── pluginFilter.md
 ├── ci
 ├── test
 ├── CMakeLisits.txt
