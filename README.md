@@ -84,7 +84,7 @@ add_subdirectory(src/filter_my_new_PI)
 
 Each plugIN has his own md file in the doc directory, structured as the [model](./doc/_doc_model_plugIN.md). 
 
-D'ont forget to update [the list](#adding-a-filter) with a link with the documentation.
+D'ont forget to update [the list](#list-of-filters) with a link with the documentation.
 
 
  
