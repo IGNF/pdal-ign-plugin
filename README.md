@@ -21,12 +21,12 @@ The code is structured as :
 │   ├── plugins forlder
 │   │   ├── plufinFilter.cpp
 │   │   ├── plufinFilter.h
-│   │   ├── CMakeLisits.txt
+│   │   ├── CMakeLists.txt
 ├── doc
 │   ├── pluginFilter.md
 ├── ci
 ├── test
-├── CMakeLisits.txt
+├── CMakeLists.txt
 ├── environment*.yml
 ├── Dockerfile 
 ├── .github 
