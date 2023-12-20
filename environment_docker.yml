@@ -1,0 +1,6 @@
+name: pdal_ign_plugin
+channels:
+  - conda-forge
+dependencies:
+  - pdal
+

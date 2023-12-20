@@ -1,8 +1,8 @@
 FROM mambaorg/micromamba:latest as build_ign_pdal_plugin
-COPY environment.yml /environment.yml
+COPY environment_docker.yml /environment_docker.yml
 
 USER root
-RUN micromamba env create -f /environment.yml
+RUN micromamba env create -f /environment_docker.yml
 SHELL ["micromamba", "run", "-n", "pdal_ign_plugin", "/bin/bash", "-c"]
 
 COPY . .
@@ -14,4 +14,4 @@ RUN make -j4 install
 
 ENV PATH=$PATH:/opt/conda/envs/pdal_ign_plugin/bin/
 ENV PROJ_LIB=/opt/conda/envs/pdal_ign_plugin/share/proj/
-ENV PDAL_DRIVER_PATH=/tmp/install/lib
+ENV PDAL_DRIVER_PATH=/tmp/install/lib 
