@@ -1,6 +1,7 @@
 name: pdal_ign_plugin
 channels:
   - conda-forge
+  - anaconda
 dependencies:
   - pdal
   - python-pdal
@@ -8,6 +9,8 @@ dependencies:
   - black
   - isort
   - shapely
+  - gdal
+  - cmake
   - pip:
     - ign-pdal-tools
 

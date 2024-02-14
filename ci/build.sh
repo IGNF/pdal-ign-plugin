@@ -24,6 +24,7 @@ fi
 conda activate pdal_ign_plugin
 
 export CONDA_PREFIX=$CONDA_PREFIX
+echo conda is $CONDA_PREFIX 
 
 mkdir build
 cd build

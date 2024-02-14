@@ -1,17 +1,15 @@
 import csv
 import json
 import math
-import os
 import tempfile
 from test import utils
 
 import pdal
 import pdaltools.las_info as li
 import pytest
-import shapely
-
 
 def test_grid_decimation():
+
     ini_las = "test/data/4_6.las"
     resolution = 10
 
@@ -26,7 +24,6 @@ def test_grid_decimation():
     d_width = math.floor((bounds[0][1] - bounds[0][0]) / resolution) + 1
     d_height = math.floor((bounds[1][1] - bounds[1][0]) / resolution) + 1
     nb_dalle = d_width * d_height
-    print("size of the grid", nb_dalle)
 
     PIPELINE = [
         {"type": "readers.las", "filename": ini_las},

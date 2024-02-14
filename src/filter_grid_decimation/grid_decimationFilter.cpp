@@ -39,7 +39,7 @@ void GridDecimationFilter::addArgs(ProgramArgs& args)
 {
     args.add("resolution", "Cell edge size, in units of X/Y",m_args->m_edgeLength, 1.);
     args.add("output_type", "Point keept into the cells ('min', 'max')", m_args->m_methodKeep, "max" );
-    args.add("output_name_attribut", "Name of the add attribut", m_args->m_nameAddAttribut, "grid" );
+    args.add("output_name_attribut", "Name of the added attribut", m_args->m_nameAddAttribut, "grid" );
     args.add("output_wkt", "Export the grid as wkt", m_args->m_nameWktgrid, "" );
 
 }
