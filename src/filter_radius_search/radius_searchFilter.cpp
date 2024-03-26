@@ -37,6 +37,8 @@ void RadiusSearchFilter::addArgs(ProgramArgs& args)
     args.add("radius", "Distance of neighbors to consult", m_args->m_radius, 1.);
     args.add("output_name_attribute", "Name of the added attribut", m_args->m_nameAddAttribute, "radius" );
     args.add("3d_search", "Search in 3d", m_args->search3d, false );
+    args.add("2d_search_above", "if search in 2d : filter point above the distance", m_args->m_search_bellow, 0. );
+    args.add("2d_search_bellow", "if search in 2d : filter point bellow the distance", m_args->m_search_above, 0. );
 }
 
 void RadiusSearchFilter::addDimensions(PointLayoutPtr layout)
@@ -68,13 +70,29 @@ void RadiusSearchFilter::ready(PointTableRef)
 
 void RadiusSearchFilter::doOneNoDomain(PointRef &point)
 {
-    // build3dIndex and build2dIndex are buuild once
+    // build3dIndex and build2dIndex are build once
     PointIdList iNeighbors;
     if (m_args->search3d) iNeighbors = refView->build3dIndex().radius(point, m_args->m_radius);
     else iNeighbors = refView->build2dIndex().radius(point, m_args->m_radius);
     
     if (iNeighbors.size() == 0)
         return;
+    
+    if (!m_args->search3d)
+    {
+        double Zref = point.getFieldAs<double>(Dimension::Id::Z);
+        if (m_args->m_search_bellow>0 || m_args->m_search_above>0)
+        {
+            bool take (false);
+            for (PointId ptId : iNeighbors)
+            {
+                double Zpt = refView->point(ptId).getFieldAs<double>(Dimension::Id::Z);
+                if (m_args->m_search_bellow>0 && Zpt>Zref && (Zpt-Zref)<m_args->m_search_bellow) {take=true; break;}
+                if (m_args->m_search_above>0 && Zpt<Zref && (Zref-Zpt)<m_args->m_search_above) {take=true; break;}
+            }
+            if (!take) return;
+        }
+    }
     
     m_args->m_ptsToUpdate.push_back(point.pointId());
 }

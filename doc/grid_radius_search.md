@@ -43,3 +43,9 @@ Options
 
 **output_name_attribut**: The name of the new attribut. [Default: radius]
 
+**3d_search**: Search in 3d (as a ball). [Default: false]
+
+**2d_search_above**: If 3d_search is false, take points only if exists points between the referent point and a distance above. [Default: 0.]
+
+**2d_search_bellow**: If 3d_search is false, take points only if exists points between the referent point and a distance bellow. [Default: 0.]
+

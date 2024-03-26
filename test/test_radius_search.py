@@ -35,6 +35,7 @@ def test_radius_search():
     nb_points = randint(10, 20)
     nb_points_take_2d = 0
     nb_points_take_3d = 0
+    nb_points_take_2d_above_bellow = 0
 
     for i in range(nb_points):
         pti_x = pt_x + rand.uniform(-1.5, 1.5)
@@ -51,6 +52,10 @@ def test_radius_search():
 
         if distance_i_2d < distance_radius:
             nb_points_take_2d += 1
+            if pti_z>pt_z and pti_z-pt_z>0.5:
+                nb_points_take_2d_above_bellow += 1
+            if pti_z<pt_z and pt_z-pti_z>0.5:
+                nb_points_take_2d_above_bellow += 1
         if distance_i_3d < distance_radius:
             nb_points_take_3d += 1
 
@@ -86,7 +91,17 @@ def test_radius_search():
             "src_domain": "SRS_DOMAIN",
             "reference_domain": "REF_DOMAIN",
             "output_name_attribute": "radius_2D",
-            "3d_search":False
+            "3d_search":False,
+        },
+        {
+            "type": filter,
+            "radius": "1.",
+            "src_domain": "SRS_DOMAIN",
+            "reference_domain": "REF_DOMAIN",
+            "output_name_attribute": "radius_2D_above_bellow",
+            "3d_search": False,
+            "2d_search_above": 0.5,
+            "2d_search_bellow": 0.5,
         },
         {
             "type": filter,
@@ -107,7 +122,10 @@ def test_radius_search():
 
     nb_pts_radius_2d = 0
     nb_pts_radius_3d = 0
+    nb_pts_radius_2d_above_bellow = 0
     for pt in array:
+        if pt["radius_2D_above_bellow"] > 0:
+            nb_pts_radius_2d_above_bellow += 1
         if pt["radius_2D"] > 0:
             nb_pts_radius_2d += 1
         if pt["radius_3D"] > 0:
@@ -115,3 +133,4 @@ def test_radius_search():
 
     assert nb_pts_radius_2d == nb_points_take_2d
     assert nb_pts_radius_3d == nb_points_take_3d
+    assert nb_pts_radius_2d_above_bellow == nb_points_take_2d_above_bellow

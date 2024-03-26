@@ -32,6 +32,7 @@ private:
         Dimension::Id m_dim;
         bool search3d;
         Dimension::Id m_dim_ref, m_dim_src;
+        double m_search_bellow, m_search_above;
     };
     std::unique_ptr<RadiusSearchArgs> m_args;
     PointViewPtr refView;
