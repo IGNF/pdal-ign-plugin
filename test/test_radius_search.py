@@ -40,7 +40,7 @@ def test_radius_search():
     for i in range(nb_points):
         pti_x = pt_x + rand.uniform(-1.5, 1.5)
         pti_y = pt_y + rand.uniform(-1.5, 1.5)
-        pti_z = pt_z + rand.uniform(-1.5, 1.5)
+        pti_z = round(pt_z + rand.uniform(-1.5, 1.5),2) #pdal only takes 2 numbers precision
         pt_i = (pti_x, pti_y, pti_z, 2)
 
         arrays_pti = np.array([pt_i], dtype=dtype)
@@ -52,9 +52,7 @@ def test_radius_search():
 
         if distance_i_2d < distance_radius:
             nb_points_take_2d += 1
-            if pti_z>pt_z and pti_z-pt_z>0.5:
-                nb_points_take_2d_above_bellow += 1
-            if pti_z<pt_z and pt_z-pti_z>0.5:
+            if abs(pti_z-pt_z)<0.5:
                 nb_points_take_2d_above_bellow += 1
         if distance_i_3d < distance_radius:
             nb_points_take_3d += 1
