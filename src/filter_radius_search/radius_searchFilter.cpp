@@ -117,15 +117,11 @@ void RadiusSearchFilter::filter(PointView& view)
     for (PointId id = 0; id < view.size(); ++id)
     {
         temp.setPointId(id);
-        temp.setField(m_args->m_dim, int64_t(0));
+        temp.setField(m_args->m_dim, int64_t(0)); // initialisation
         
         // process only points that satisfy a domain condition
-        //if (r.valuePasses(temp.getFieldAs<double>(r.m_id)))
         if (temp.getFieldAs<int8_t>(m_args->m_dim_ref)>0)
-        {
             refView->appendPoint(view, id);
-            break;
-        }
     }
         
     for (PointId id = 0; id < view.size(); ++id)
