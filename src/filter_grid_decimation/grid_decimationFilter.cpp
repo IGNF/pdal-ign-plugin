@@ -81,8 +81,8 @@ void GridDecimationFilter::processOne(BOX2D bounds, PointRef& point, PointViewPt
     double y = point.getFieldAs<double>(Dimension::Id::Y);
     int id = point.getFieldAs<double>(Dimension::Id::PointId);
 
-    double d_width_pt = std::floor((x - bounds.minx) / m_args->m_edgeLength) + 1;
-    double d_height_pt = std::floor((y - bounds.miny) / m_args->m_edgeLength) + 1;
+    double d_width_pt = std::floor((x - bounds.minx) / m_args->m_edgeLength);
+    double d_height_pt = std::floor((y - bounds.miny) / m_args->m_edgeLength);
 
     int width = static_cast<int>(d_width_pt);
     int height = static_cast<int>(d_height_pt);
