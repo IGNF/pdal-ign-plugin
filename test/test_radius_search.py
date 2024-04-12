@@ -89,7 +89,7 @@ def test_radius_search():
             "src_domain": "SRS_DOMAIN",
             "reference_domain": "REF_DOMAIN",
             "output_name_attribute": "radius_2D",
-            "3d_search":False,
+            "search_3d":False,
         },
         {
             "type": filter,
@@ -97,9 +97,9 @@ def test_radius_search():
             "src_domain": "SRS_DOMAIN",
             "reference_domain": "REF_DOMAIN",
             "output_name_attribute": "radius_2D_above_bellow",
-            "3d_search": False,
-            "2d_search_above": 0.5,
-            "2d_search_bellow": 0.5,
+            "search_3d": False,
+            "search_2d_above": 0.5,
+            "search_2d_bellow": 0.5,
         },
         {
             "type": filter,
@@ -107,7 +107,7 @@ def test_radius_search():
             "src_domain": "SRS_DOMAIN",
             "reference_domain": "REF_DOMAIN",
             "output_name_attribute": "radius_3D",
-            "3d_search": True
+            "search_3d": True
         }
     ]
 
