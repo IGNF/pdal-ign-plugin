@@ -21,3 +21,5 @@ COPY --from=build /tmp/install/lib /tmp/install/lib
 ENV PATH=$PATH:/opt/conda/envs/pdal_ign_plugin/bin/
 ENV PROJ_LIB=/opt/conda/envs/pdal_ign_plugin/share/proj/
 ENV PDAL_DRIVER_PATH=/tmp/install/lib
+
+COPY --from=build /tmp/macro /tmp/macro

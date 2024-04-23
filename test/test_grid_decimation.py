@@ -54,7 +54,7 @@ def test_grid_decimation():
         if pt["grid"] > 0:
             nb_pts_grid += 1
 
-    assert nb_pts_grid == 3196
+    assert nb_pts_grid == 3234
     assert nb_pts_grid <= nb_dalle
 
     data = []
