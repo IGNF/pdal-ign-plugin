@@ -3,7 +3,7 @@ import pdal
 from macro import *
 
 """
-This tool shows how to use function of macro in a pdal pipeline
+This tool shows how to use functions of macro in a pdal pipeline
 """
 
 def parse_args():

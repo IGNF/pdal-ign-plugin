@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y cmake make buil
  
 COPY src src
 COPY CMakeLists.txt CMakeLists.txt
+COPY macro macro
 
 RUN cmake -G"Unix Makefiles" -DCONDA_PREFIX=$CONDA_PREFIX -DCMAKE_BUILD_TYPE=Release  
 RUN make -j4 install
@@ -17,9 +18,9 @@ FROM debian:bullseye-slim
  
 COPY --from=build /opt/conda/envs/pdal_ign_plugin /opt/conda/envs/pdal_ign_plugin
 COPY --from=build /tmp/install/lib /tmp/install/lib
- 
+COPY --from=build /tmp/macro /macro 
+
 ENV PATH=$PATH:/opt/conda/envs/pdal_ign_plugin/bin/
 ENV PROJ_LIB=/opt/conda/envs/pdal_ign_plugin/share/proj/
 ENV PDAL_DRIVER_PATH=/tmp/install/lib
 
-COPY --from=build /tmp/macro /tmp/macro
