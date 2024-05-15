@@ -32,7 +32,7 @@ RadiusSearchFilter::~RadiusSearchFilter()
 
 void RadiusSearchFilter::addArgs(ProgramArgs& args)
 {
-    args.add("src_domain", "Selects which points will be subject to radius-based neighbors search", m_args->m_srcDomain, "SRS_DOMAIN");
+    args.add("src_domain", "Selects which points will be subject to radius-based neighbors search", m_args->m_srcDomain, "SRC_DOMAIN");
     args.add("reference_domain", "Selects which points will be considered as potential neighbors", m_args->m_referenceDomain, "REF_DOMAIN");
     args.add("radius", "Distance of neighbors to consult", m_args->m_radius, 1.);
     args.add("output_name_attribute", "Name of the added attribut", m_args->m_nameAddAttribute, "radius" );
