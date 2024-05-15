@@ -11,6 +11,7 @@ dependencies:
   - shapely
   - gdal
   - cmake
+  - pip
   - pip:
     - ign-pdal-tools
 
