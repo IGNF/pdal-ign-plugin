@@ -7,7 +7,7 @@ This tool shows how to use functions of macro in a pdal pipeline
 """
 
 def parse_args():
-    parser = argparse.ArgumentParser("Tools for apply pdal pipelines")
+    parser = argparse.ArgumentParser("Tool to apply pdal pipelines to modify classification")
     parser.add_argument("--input", "-i", type=str, required=True, help="Input las file")
     parser.add_argument("--output", "-o", type=str, required=True, help="Output las file")
     return parser.parse_args()
