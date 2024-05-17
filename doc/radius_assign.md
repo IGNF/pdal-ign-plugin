@@ -46,7 +46,7 @@ Options
 
 **is3d**: Search in 3d (as a ball). [Default: false]
 
-**is2d_above**: If is3d is false, take points only if exists points between the referent point and a distance above. [Default: 0.]
+**is2d_above**: If search in 2d : upward maximum distance in Z for potential neighbors (corresponds to a search in a cylinder with a height = is2d_above above the source point). Default (0) = infinite height [Default: 0.]
 
-**is2d_bellow**: If is3d is false, take points only if exists points between the referent point and a distance bellow. [Default: 0.]
+**is2d_below**: If search in 2d : upward maximum distance in Z for potential neighbors (corresponds to a search in a cylinder with a height = is2d_below below the source point). Default (0) = infinite height [Default: 0.]
 

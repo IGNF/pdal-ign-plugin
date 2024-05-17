@@ -31,7 +31,7 @@ def run_filter(type):
             "type": filter,
             "resolution": resolution,
             "output_type": type,
-            "output_name_attribut": "grid",
+            "output_name_attribute": "grid",
             "output_wkt": tmp_out_wkt,
         },
         {

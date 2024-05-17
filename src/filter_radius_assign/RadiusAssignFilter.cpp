@@ -1,4 +1,4 @@
-#include "radius_assignFilter.hpp"
+#include "RadiusAssignFilter.hpp"
 
 #include <pdal/PipelineManager.hpp>
 #include <pdal/StageFactory.hpp>
@@ -37,8 +37,8 @@ void RadiusAssignFilter::addArgs(ProgramArgs& args)
     args.add("radius", "Distance of neighbors to consult", m_args->m_radius, 1.);
     args.add("output_dimension", "Name of the added attribut", m_args->m_outputDimension, "radius");
     args.add("is3d", "Search in 3d", m_args->search3d, false );
-    args.add("is2d_above", "if search in 2d : filter point above the distance", m_args->m_search_bellow, 0.);
-    args.add("is2d_bellow", "if search in 2d : filter point bellow the distance", m_args->m_search_above, 0.);
+    args.add("is2d_above", "if search in 2d : upward maximum distance in Z for potential neighbors (corresponds to a search in a cylinder with a height = is2d_above above the source point). Default (0) = infinite height", m_args->m_search_above, 0.);
+    args.add("is2d_below", "if search in 2d : upward maximum distance in Z for potential neighbors (corresponds to a search in a cylinder with a height = is2d_below below the source point). Default (0) = infinite height", m_args->m_search_below, 0.);
 }
 
 void RadiusAssignFilter::addDimensions(PointLayoutPtr layout)
@@ -81,13 +81,13 @@ void RadiusAssignFilter::doOneNoDomain(PointRef &point)
     if (!m_args->search3d)
     {
         double Zref = point.getFieldAs<double>(Dimension::Id::Z);
-        if (m_args->m_search_bellow>0 || m_args->m_search_above>0)
+        if (m_args->m_search_below>0 || m_args->m_search_above>0)
         {
             bool take (false);
             for (PointId ptId : iNeighbors)
             {
                 double Zpt = refView->point(ptId).getFieldAs<double>(Dimension::Id::Z);
-                if (m_args->m_search_bellow>0 && Zpt>Zref && (Zpt-Zref)<=m_args->m_search_bellow) {take=true; break;}
+                if (m_args->m_search_below>0 && Zpt>Zref && (Zpt-Zref)<=m_args->m_search_below) {take=true; break;}
                 if (m_args->m_search_above>0 && Zpt<Zref && (Zref-Zpt)<=m_args->m_search_above) {take=true; break;}
             }
             if (!take) return;

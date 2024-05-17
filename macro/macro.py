@@ -35,7 +35,7 @@ def add_grid_decimation(pipeline, grid_resolution, output_type, condition, condi
     """
     pipeline |= pdal.Filter.ferry(dimensions=f"=>grid,")
     pipeline |= pdal.Filter.assign(value="grid = 0")
-    pipeline |= pdal.Filter.grid_decimation(resolution=grid_resolution, output_name_attribut="grid",
+    pipeline |= pdal.Filter.grid_decimation(resolution=grid_resolution, output_name_attribute="grid",
                                             output_type=output_type, where=condition)
     pipeline |= pdal.Filter.assign(value=condition_out,where=f"grid==0 && ({condition})")
     return pipeline

@@ -54,7 +54,7 @@ def run_filter(arrays_las, distance_radius, search_3d, distance_cylinder=0. ):
                 "output_dimension": "radius_search",
                 "is3d": search_3d,
                 "is2d_above": distance_cylinder,
-                "is2d_bellow": distance_cylinder,
+                "is2d_below": distance_cylinder,
             }
         ]
 
