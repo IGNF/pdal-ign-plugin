@@ -39,7 +39,7 @@ void GridDecimationFilter::addArgs(ProgramArgs& args)
 {
     args.add("resolution", "Cell edge size, in units of X/Y",m_args->m_edgeLength, 1.);
     args.add("output_type", "Point keept into the cells ('min', 'max')", m_args->m_methodKeep, "max" );
-    args.add("output_name_attribute", "Name of the added attribut", m_args->m_nameAddAttribute, "grid" );
+    args.add("output_dimension", "Name of the added dimension", m_args->m_nameOutDimension, "grid" );
     args.add("output_wkt", "Export the grid as wkt", m_args->m_nameWktgrid, "" );
 
 }
@@ -61,7 +61,7 @@ void GridDecimationFilter::ready(PointTableRef table)
     if (m_args->m_methodKeep != "max" && m_args->m_methodKeep != "min")
         throwError("The output_type must be 'max' or 'min'.");
     
-    if (m_args->m_nameAddAttribute.empty())
+    if (m_args->m_nameOutDimension.empty())
         throwError("The output_name_attribut must be given.");
     
     if (!m_args->m_nameWktgrid.empty())
@@ -70,8 +70,7 @@ void GridDecimationFilter::ready(PointTableRef table)
 
 void GridDecimationFilter::addDimensions(PointLayoutPtr layout)
 {
-    m_args->m_dim = layout->registerOrAssignDim(m_args->m_nameAddAttribute,
-            Dimension::Type::Double);
+    m_args->m_dim = layout->registerOrAssignDim(m_args->m_nameOutDimension, Dimension::Type::Double);
 }
 
 void GridDecimationFilter::processOne(BOX2D bounds, PointRef& point, PointViewPtr view)

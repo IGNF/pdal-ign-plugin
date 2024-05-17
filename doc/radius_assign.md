@@ -42,7 +42,7 @@ Options
 **update_expression** :
   A list of :ref:`assignment expressions <Assignment Expressions>` to be applied to the points that satisfy the radius search. The list of values is evaluated in order.
 
-**output_name_attribut**: The name of the new attribute'. [Default: radius]
+**output_dimension**: The name of the new dimension'. [Default: radius]
 
 **is3d**: Search in 3d (as a ball). [Default: false]
 

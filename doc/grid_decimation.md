@@ -37,6 +37,6 @@ Options
 **resolution** :
   The resolution of the cells in meter. [Default: 1.]
 
-**output_name_attribut**: The name of the new attribut. [Default: grid]
+**output_dimension**: The name of the new dimension. [Default: grid]
 
 **output_wkt**: the name of the export grid file as wkt polygon. If none, no export [Default:""]
