@@ -1,5 +1,7 @@
 # filter grid decimation
 
+**Deprecated** : *better use the gridDecimation filter of pdal > 2.7*
+
 Purpose
 ---------------------------------------------------------------------------------------------------------
 
