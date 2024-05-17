@@ -4,17 +4,17 @@
 #include <pdal/KDIndex.hpp>
 #include <unordered_map>
 
-extern "C" int32_t RadiusSearchFilter_ExitFunc();
-extern "C" PF_ExitFunc RadiusSearchFilter_InitPlugin();
+extern "C" int32_t RadiusAssignFilter_ExitFunc();
+extern "C" PF_ExitFunc RadiusAssignFilter_InitPlugin();
 
 namespace pdal
 {
 
-class PDAL_DLL RadiusSearchFilter : public Filter
+class PDAL_DLL RadiusAssignFilter : public Filter
 {
 public:
-    RadiusSearchFilter();
-    ~RadiusSearchFilter();
+    RadiusAssignFilter();
+    ~RadiusAssignFilter();
 
     static void * create();
     static int32_t destroy(void *);
@@ -22,7 +22,7 @@ public:
 
 private:
     
-    struct RadiusSearchArgs
+    struct RadiusAssignArgs
     {
         std::string m_referenceDomain;
         std::string m_srcDomain;
@@ -34,7 +34,7 @@ private:
         Dimension::Id m_dim_ref, m_dim_src;
         double m_search_bellow, m_search_above;
     };
-    std::unique_ptr<RadiusSearchArgs> m_args;
+    std::unique_ptr<RadiusAssignArgs> m_args;
     PointViewPtr refView;
     
     virtual void addArgs(ProgramArgs& args);
@@ -47,8 +47,8 @@ private:
     bool doOne(PointRef& point);
     void doOneNoDomain(PointRef &point);
     
-    RadiusSearchFilter& operator=(const RadiusSearchFilter&) = delete;
-    RadiusSearchFilter(const RadiusSearchFilter&) = delete;
+    RadiusAssignFilter& operator=(const RadiusAssignFilter&) = delete;
+    RadiusAssignFilter(const RadiusAssignFilter&) = delete;
 };
 
 } // namespace pdal

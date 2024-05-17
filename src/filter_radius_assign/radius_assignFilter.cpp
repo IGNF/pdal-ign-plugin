@@ -17,38 +17,38 @@ static PluginInfo const s_info = PluginInfo(
     "Re-assign some point attributes based KNN voting",
     "" );
 
-CREATE_SHARED_STAGE(RadiusSearchFilter, s_info)
+CREATE_SHARED_STAGE(RadiusAssignFilter, s_info)
 
-std::string RadiusSearchFilter::getName() const { return s_info.name; }
+std::string RadiusAssignFilter::getName() const { return s_info.name; }
 
-RadiusSearchFilter::RadiusSearchFilter() :
-m_args(new RadiusSearchFilter::RadiusSearchArgs)
+RadiusAssignFilter::RadiusAssignFilter() :
+m_args(new RadiusAssignFilter::RadiusAssignArgs)
 {}
 
 
-RadiusSearchFilter::~RadiusSearchFilter()
+RadiusAssignFilter::~RadiusAssignFilter()
 {}
 
 
-void RadiusSearchFilter::addArgs(ProgramArgs& args)
+void RadiusAssignFilter::addArgs(ProgramArgs& args)
 {
     args.add("src_domain", "Selects which points will be subject to radius-based neighbors search", m_args->m_srcDomain, "SRC_DOMAIN");
     args.add("reference_domain", "Selects which points will be considered as potential neighbors", m_args->m_referenceDomain, "REF_DOMAIN");
     args.add("radius", "Distance of neighbors to consult", m_args->m_radius, 1.);
-    args.add("output_dimension", "Name of the added attribut", m_args->m_outputDimension, "radius" );
+    args.add("output_dimension", "Name of the added attribut", m_args->m_outputDimension, "radius");
     args.add("search_3d", "Search in 3d", m_args->search3d, false );
-    args.add("search_2d_above", "if search in 2d : filter point above the distance", m_args->m_search_bellow, 0. );
-    args.add("search_2d_bellow", "if search in 2d : filter point bellow the distance", m_args->m_search_above, 0. );
+    args.add("search_2d_above", "if search in 2d : filter point above the distance", m_args->m_search_bellow, 0.);
+    args.add("search_2d_bellow", "if search in 2d : filter point bellow the distance", m_args->m_search_above, 0.);
 }
 
-void RadiusSearchFilter::addDimensions(PointLayoutPtr layout)
+void RadiusAssignFilter::addDimensions(PointLayoutPtr layout)
 {
     m_args->m_dim = layout->registerOrAssignDim(m_args->m_outputDimension, Dimension::Type::Double);
     m_args->m_dim_ref = layout->registerOrAssignDim(m_args->m_referenceDomain,Dimension::Type::Unsigned8);
     m_args->m_dim_src = layout->registerOrAssignDim(m_args->m_srcDomain,Dimension::Type::Unsigned8);
 }
 
-void RadiusSearchFilter::initialize()
+void RadiusAssignFilter::initialize()
 {
     if (m_args->m_referenceDomain.empty())
         throwError("The reference_domain must be given.");
@@ -58,17 +58,17 @@ void RadiusSearchFilter::initialize()
         throwError("The output_name_attribut must be given.");
 }
 
-void RadiusSearchFilter::prepared(PointTableRef table)
+void RadiusAssignFilter::prepared(PointTableRef table)
 {
     PointLayoutPtr layout(table.layout());
 }
 
-void RadiusSearchFilter::ready(PointTableRef)
+void RadiusAssignFilter::ready(PointTableRef)
 {
     m_args->m_ptsToUpdate.clear();
 }
 
-void RadiusSearchFilter::doOneNoDomain(PointRef &point)
+void RadiusAssignFilter::doOneNoDomain(PointRef &point)
 {
     // build3dIndex and build2dIndex are build once
     PointIdList iNeighbors;
@@ -99,7 +99,7 @@ void RadiusSearchFilter::doOneNoDomain(PointRef &point)
 
 
 // update point.  kdi and temp both reference the NN point cloud
-bool RadiusSearchFilter::doOne(PointRef& point)
+bool RadiusAssignFilter::doOne(PointRef& point)
 {
     if (m_args->m_srcDomain.empty())  // No domain, process all points
         doOneNoDomain(point);
@@ -108,7 +108,7 @@ bool RadiusSearchFilter::doOne(PointRef& point)
     return true;
 }
 
-void RadiusSearchFilter::filter(PointView& view)
+void RadiusAssignFilter::filter(PointView& view)
 {
     PointRef point_src(view, 0);
     PointRef temp(view, 0);
