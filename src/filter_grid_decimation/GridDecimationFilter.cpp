@@ -107,8 +107,8 @@ void GridDecimationFilter::processOne(BOX2D bounds, PointRef& point, PointViewPt
 
 void GridDecimationFilter::createGrid(BOX2D bounds)
 {
-    double d_width = std::floor((bounds.maxx - bounds.minx) / m_args->m_edgeLength) + 1;
-    double d_height = std::floor((bounds.maxy - bounds.miny) / m_args->m_edgeLength) + 1;
+    double d_width = std::ceil((bounds.maxx - bounds.minx) / m_args->m_edgeLength);
+    double d_height = std::ceil((bounds.maxy - bounds.miny) / m_args->m_edgeLength);
     
     if (d_width < 0.0 || d_width > (std::numeric_limits<int>::max)())
         throwError("Grid width out of range.");
