@@ -20,7 +20,8 @@ This pipeline updates the Keypoint dimension of all points with classification 1
           "src_domain" : "Classification[1:2]",
           "reference_domain" : "Classification[6:6]",
           "radius" : 1,
-	  "output_name_attribut": "radius"
+	  	  "output_name_attribut": "radius",
+	  	  "is3d": True
       },
       "output.las"
   ]
@@ -43,9 +44,9 @@ Options
 
 **output_name_attribut**: The name of the new attribute'. [Default: radius]
 
-**3d_search**: Search in 3d (as a ball). [Default: false]
+**is3d**: Search in 3d (as a ball). [Default: false]
 
-**2d_search_above**: If 3d_search is false, take points only if exists points between the referent point and a distance above. [Default: 0.]
+**is2d_above**: If is3d is false, take points only if exists points between the referent point and a distance above. [Default: 0.]
 
-**2d_search_bellow**: If 3d_search is false, take points only if exists points between the referent point and a distance bellow. [Default: 0.]
+**is2d_bellow**: If is3d is false, take points only if exists points between the referent point and a distance bellow. [Default: 0.]
 

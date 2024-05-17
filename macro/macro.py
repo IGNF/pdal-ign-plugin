@@ -19,7 +19,7 @@ def add_radius_assign(pipeline, radius, search_3d, condition_src, condition_ref,
                                           "REF_DOMAIN = 0", f"REF_DOMAIN = 1 WHERE {condition_ref}",
                                           "radius_search = 0"])
     pipeline |= pdal.Filter.radius_assign(radius=radius, src_domain="SRS_DOMAIN",reference_domain="REF_DOMAIN",
-                                          output_dimension="radius_search", search_3d=search_3d)
+                                          output_dimension="radius_search", is3d=search_3d)
     pipeline |= pdal.Filter.assign(value=condition_out,where="radius_search==1")
     return pipeline
 

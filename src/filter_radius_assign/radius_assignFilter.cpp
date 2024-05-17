@@ -36,9 +36,9 @@ void RadiusAssignFilter::addArgs(ProgramArgs& args)
     args.add("reference_domain", "Selects which points will be considered as potential neighbors", m_args->m_referenceDomain, "REF_DOMAIN");
     args.add("radius", "Distance of neighbors to consult", m_args->m_radius, 1.);
     args.add("output_dimension", "Name of the added attribut", m_args->m_outputDimension, "radius");
-    args.add("search_3d", "Search in 3d", m_args->search3d, false );
-    args.add("search_2d_above", "if search in 2d : filter point above the distance", m_args->m_search_bellow, 0.);
-    args.add("search_2d_bellow", "if search in 2d : filter point bellow the distance", m_args->m_search_above, 0.);
+    args.add("is3d", "Search in 3d", m_args->search3d, false );
+    args.add("is2d_above", "if search in 2d : filter point above the distance", m_args->m_search_bellow, 0.);
+    args.add("is2d_bellow", "if search in 2d : filter point bellow the distance", m_args->m_search_above, 0.);
 }
 
 void RadiusAssignFilter::addDimensions(PointLayoutPtr layout)
