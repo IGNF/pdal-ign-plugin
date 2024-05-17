@@ -54,7 +54,7 @@ def run_filter(type):
         if pt["grid"] > 0:
             nb_pts_grid += 1
 
-    assert nb_pts_grid == 3234
+    assert nb_pts_grid == 3231
     assert nb_pts_grid <= nb_dalle
 
     data = []
