@@ -43,7 +43,7 @@ void RadiusAssignFilter::addArgs(ProgramArgs& args)
 
 void RadiusAssignFilter::addDimensions(PointLayoutPtr layout)
 {
-    m_args->m_dim = layout->registerOrAssignDim(m_args->m_outputDimension, Dimension::Type::Double);
+    m_args->m_dim = layout->registerOrAssignDim(m_args->m_outputDimension, Dimension::Type::Unsigned8);
     m_args->m_dim_ref = layout->registerOrAssignDim(m_args->m_referenceDomain,Dimension::Type::Unsigned8);
     m_args->m_dim_src = layout->registerOrAssignDim(m_args->m_srcDomain,Dimension::Type::Unsigned8);
 }
@@ -87,8 +87,8 @@ void RadiusAssignFilter::doOneNoDomain(PointRef &point)
             for (PointId ptId : iNeighbors)
             {
                 double Zpt = refView->point(ptId).getFieldAs<double>(Dimension::Id::Z);
-                if (m_args->m_search_bellow>0 && Zpt>Zref && (Zpt-Zref)<m_args->m_search_bellow) {take=true; break;}
-                if (m_args->m_search_above>0 && Zpt<Zref && (Zref-Zpt)<m_args->m_search_above) {take=true; break;}
+                if (m_args->m_search_bellow>0 && Zpt>Zref && (Zpt-Zref)<=m_args->m_search_bellow) {take=true; break;}
+                if (m_args->m_search_above>0 && Zpt<Zref && (Zref-Zpt)<=m_args->m_search_above) {take=true; break;}
             }
             if (!take) return;
         }

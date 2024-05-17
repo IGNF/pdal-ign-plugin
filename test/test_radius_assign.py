@@ -105,7 +105,7 @@ def test_radius_assign_3d():
 
     def func_test(pt_ini, pt):
         distance_i = distance3d(pt_ini, pt)
-        if distance_i < distance_radius:
+        if distance_i <= distance_radius:
             return 1
         return 0
 
@@ -120,7 +120,7 @@ def test_radius_assign_2d():
 
     def func_test(pt_ini, pt):
         distance_i = distance2d(pt_ini, pt)
-        if distance_i < distance_radius:
+        if distance_i <= distance_radius:
             return 1
         return 0
 
@@ -136,8 +136,8 @@ def test_radius_assign_2d_cylinder():
 
     def func_test(pt_ini, pt):
         distance_i = distance2d(pt_ini, pt)
-        if distance_i < distance_radius:
-            if abs(pt_ini[2] - pt[2]) < distance_cylinder:
+        if distance_i <= distance_radius:
+            if abs(pt_ini[2] - pt[2]) <= distance_cylinder:
                 return 1
         return 0
 
