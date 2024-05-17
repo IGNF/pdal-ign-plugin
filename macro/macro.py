@@ -33,8 +33,6 @@ def add_grid_decimation(pipeline, grid_resolution, output_type, condition, condi
     output_type : "max" or "min" (the highest or lower points of the grid)
     condition, condition_out : a pdal condition as "Classification==2"
     """
-    pipeline |= pdal.Filter.ferry(dimensions=f"=>grid,")
-    pipeline |= pdal.Filter.assign(value="grid = 0")
     pipeline |= pdal.Filter.grid_decimation(resolution=grid_resolution, output_dimension="grid",
                                             output_type=output_type, where=condition)
     pipeline |= pdal.Filter.assign(value=condition_out,where=f"grid==0 && ({condition})")
