@@ -5,14 +5,16 @@ channels:
 dependencies:
   - pdal
   - python-pdal
-  - pytest
-  - black
-  - isort
-  - shapely
   - gdal
   - cmake
   - pip
   - pip:
     - ign-pdal-tools
+# --------- dev dep --------- #
+  - pre-commit # hooks for applying linters on commit
+  - black # code formatting
+  - isort # import sorting
+  - flake8 # code analysis
+  - pytest
 
 
