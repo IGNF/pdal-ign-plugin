@@ -20,7 +20,7 @@ This pipeline updates the Keypoint dimension of all points with classification 1
           "src_domain" : "Classification[1:2]",
           "reference_domain" : "Classification[6:6]",
           "radius" : 1,
-	  	  "output_name_attribut": "radius",
+	  	  "output_dimension": "radius",
 	  	  "is3d": True
       },
       "output.las"
@@ -38,9 +38,6 @@ Options
 
 **radius** :
   An positive float which specifies the radius for the neighbors search.
-
-**update_expression** :
-  A list of :ref:`assignment expressions <Assignment Expressions>` to be applied to the points that satisfy the radius search. The list of values is evaluated in order.
 
 **output_dimension**: The name of the new dimension'. [Default: radius]
 
