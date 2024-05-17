@@ -20,7 +20,7 @@ def distance3d(pt1, pt2):
 
 def run_filter(arrays_las, distance_radius, search_3d, distance_cylinder=0. ):
 
-    filter = "filters.radius_search"
+    filter = "filters.radius_assign"
     utils.pdal_has_plugin(filter)
 
     with tempfile.NamedTemporaryFile(suffix="_las_tmp.las") as las:
@@ -99,7 +99,7 @@ def build_random_points_around_one_point(test_function):
     return arrays_las, nb_points_take
 
 
-def test_radius_search_3d():
+def test_radius_assign_3d():
 
     distance_radius = 1
 
@@ -114,7 +114,7 @@ def test_radius_search_3d():
     assert nb_pts_radius_3d == nb_points_take_3d
 
 
-def test_radius_search_2d():
+def test_radius_assign_2d():
 
     distance_radius = 1
 
@@ -129,7 +129,7 @@ def test_radius_search_2d():
     assert nb_pts_radius_2d == nb_points_take_2d
 
 
-def test_radius_search_2d_cylinder():
+def test_radius_assign_2d_cylinder():
 
     distance_radius = 1
     distance_cylinder = 0.25

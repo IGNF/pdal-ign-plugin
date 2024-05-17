@@ -12,5 +12,5 @@ set(CMAKE_DEBUG_POSTFIX d)
 
 ## add plugin
 add_subdirectory(src/filter_grid_decimation)
-add_subdirectory(src/filter_radius_search)
+add_subdirectory(src/filter_radius_assign)
 

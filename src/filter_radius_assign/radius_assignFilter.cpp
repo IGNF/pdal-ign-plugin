@@ -1,4 +1,4 @@
-#include "radius_searchFilter.hpp"
+#include "radius_assignFilter.hpp"
 
 #include <pdal/PipelineManager.hpp>
 #include <pdal/StageFactory.hpp>
@@ -13,7 +13,7 @@ namespace pdal
 {
 
 static PluginInfo const s_info = PluginInfo(
-    "filters.radius_search",
+    "filters.radius_assign",
     "Re-assign some point attributes based KNN voting",
     "" );
 

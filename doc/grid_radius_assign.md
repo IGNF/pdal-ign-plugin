@@ -1,9 +1,9 @@
-# filter grid decimation
+# filter radius assign
 
 Purpose
 ---------------------------------------------------------------------------------------------------------
 
-The **radius search filter** add a new attribut where the value depends on their neighbors in a given radius: For each point in the domain src_domain_, if it has any neighbor with a distance lower than radius_ that belongs to the domain reference_domain_, it is updated.
+The **radius assign filter** add a new attribut where the value depends on their neighbors in a given radius: For each point in the domain src_domain_, if it has any neighbor with a distance lower than radius_ that belongs to the domain reference_domain_, it is updated.
 
 
 Example
@@ -16,7 +16,7 @@ This pipeline updates the Keypoint dimension of all points with classification 1
   [
      "file-input.las",
       {
-          "type" : "filters.radiussearch",
+          "type" : "filters.radius_assign",
           "src_domain" : "Classification[1:2]",
           "reference_domain" : "Classification[6:6]",
           "radius" : 1,

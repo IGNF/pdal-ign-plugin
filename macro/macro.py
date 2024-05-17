@@ -6,7 +6,7 @@ Some useful filters combinations for complete pdal pipeline
 """
 
 
-def add_radius_search(pipeline, radius, search_3d, condition_src, condition_ref, condition_out ):
+def add_radius_assign(pipeline, radius, search_3d, condition_src, condition_ref, condition_out ):
     """
     search points from "condition_src" closed from "condition_ref", and reassign them to "condition_out"
     This combination is equivalent to the CloseBy macro of TerraScan
@@ -18,7 +18,7 @@ def add_radius_search(pipeline, radius, search_3d, condition_src, condition_ref,
     pipeline |= pdal.Filter.assign(value=["SRS_DOMAIN = 0", f"SRS_DOMAIN = 1 WHERE {condition_src}",
                                           "REF_DOMAIN = 0", f"REF_DOMAIN = 1 WHERE {condition_ref}",
                                           "radius_search = 0"])
-    pipeline |= pdal.Filter.radius_search(radius=radius, src_domain="SRS_DOMAIN",reference_domain="REF_DOMAIN",
+    pipeline |= pdal.Filter.radius_assign(radius=radius, src_domain="SRS_DOMAIN",reference_domain="REF_DOMAIN",
                                           output_name_attribute="radius_search", search_3d=search_3d)
     pipeline |= pdal.Filter.assign(value=condition_out,where="radius_search==1")
     return pipeline
