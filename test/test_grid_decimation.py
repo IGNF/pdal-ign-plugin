@@ -8,7 +8,7 @@ import pdal
 import pdaltools.las_info as li
 import pytest
 
-def test_grid_decimation():
+def run_filter(type):
 
     ini_las = "test/data/4_6.las"
     resolution = 10
@@ -30,7 +30,7 @@ def test_grid_decimation():
         {
             "type": filter,
             "resolution": resolution,
-            "output_type": "max",
+            "output_type": type,
             "output_name_attribut": "grid",
             "output_wkt": tmp_out_wkt,
         },
@@ -64,3 +64,13 @@ def test_grid_decimation():
             data.append(line[0])
 
     assert len(data) == nb_dalle
+
+    return nb_pts_grid
+
+def test_grid_decimation_max():
+    run_filter("max")
+
+def test_grid_decimation_max():
+    run_filter("min")
+
+
