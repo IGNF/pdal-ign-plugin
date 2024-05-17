@@ -28,7 +28,7 @@ private:
         std::string m_srcDomain;
         double m_radius;
         PointIdList m_ptsToUpdate;
-        std::string m_nameAddAttribute;
+        std::string m_outputDimension;
         Dimension::Id m_dim;
         bool search3d;
         Dimension::Id m_dim_ref, m_dim_src;

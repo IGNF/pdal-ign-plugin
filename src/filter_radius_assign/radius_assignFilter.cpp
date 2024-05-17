@@ -35,7 +35,7 @@ void RadiusSearchFilter::addArgs(ProgramArgs& args)
     args.add("src_domain", "Selects which points will be subject to radius-based neighbors search", m_args->m_srcDomain, "SRC_DOMAIN");
     args.add("reference_domain", "Selects which points will be considered as potential neighbors", m_args->m_referenceDomain, "REF_DOMAIN");
     args.add("radius", "Distance of neighbors to consult", m_args->m_radius, 1.);
-    args.add("output_name_attribute", "Name of the added attribut", m_args->m_nameAddAttribute, "radius" );
+    args.add("output_dimension", "Name of the added attribut", m_args->m_outputDimension, "radius" );
     args.add("search_3d", "Search in 3d", m_args->search3d, false );
     args.add("search_2d_above", "if search in 2d : filter point above the distance", m_args->m_search_bellow, 0. );
     args.add("search_2d_bellow", "if search in 2d : filter point bellow the distance", m_args->m_search_above, 0. );
@@ -43,7 +43,7 @@ void RadiusSearchFilter::addArgs(ProgramArgs& args)
 
 void RadiusSearchFilter::addDimensions(PointLayoutPtr layout)
 {
-    m_args->m_dim = layout->registerOrAssignDim(m_args->m_nameAddAttribute, Dimension::Type::Double);
+    m_args->m_dim = layout->registerOrAssignDim(m_args->m_outputDimension, Dimension::Type::Double);
     m_args->m_dim_ref = layout->registerOrAssignDim(m_args->m_referenceDomain,Dimension::Type::Unsigned8);
     m_args->m_dim_src = layout->registerOrAssignDim(m_args->m_srcDomain,Dimension::Type::Unsigned8);
 }
@@ -54,7 +54,7 @@ void RadiusSearchFilter::initialize()
         throwError("The reference_domain must be given.");
     if (m_args->m_radius <= 0)
         throwError("Invalid 'radius' option: " + std::to_string(m_args->m_radius) + ", must be > 0");
-    if (m_args->m_nameAddAttribute.empty())
+    if (m_args->m_outputDimension.empty())
         throwError("The output_name_attribut must be given.");
 }
 
