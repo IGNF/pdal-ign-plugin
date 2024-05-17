@@ -18,21 +18,6 @@ def distance2d(pt1, pt2):
 def distance3d(pt1, pt2):
     return sqrt((pt1[0] - pt2[0]) ** 2 + (pt1[1] - pt2[1]) ** 2 + (pt1[2] - pt2[2]) ** 2)
 
-def build_random_points_arround_one_point(pt_ini):
-
-    nb_points = randint(20, 50)
-    arrays_pts = []
-    for i in range(nb_points):
-        pti_x = pt_ini[0] + rand.uniform(-1.5, 1.5)
-        pti_y = pt_ini[1] + rand.uniform(-1.5, 1.5)
-
-        # pdal write takes 2 numbers precision (scale_z=0.01 and offset_z=0 by default)
-        pti_z = round(pt_ini[2] + rand.uniform(-1.5, 1.5), 2)
-        pt_i = (pti_x, pti_y, pti_z, 2)
-        arrays_pts.append(pt_i)
-
-    return arrays_pts
-
 def run_filter(arrays_las, distance_radius, search_3d, distance_cylinder=0. ):
 
     filter = "filters.radius_search"
@@ -78,71 +63,69 @@ def run_filter(arrays_las, distance_radius, search_3d, distance_cylinder=0. ):
         arrays = pipeline.arrays
         array = arrays[0]
 
-    return array
+    nb_pts_radius_search = 0
+    for pt in array:
+        if pt["radius_search"] > 0:
+            nb_pts_radius_search += 1
 
-def test_radius_search_3d():
+    return nb_pts_radius_search
 
-    distance_radius = 1
-    nb_points_take_3d = 0
+
+def build_random_points_around_one_point(test_function):
 
     pt_x = 1639825.15
     pt_y = 1454924.63
     pt_z = 7072.17
     pt_ini = (pt_x, pt_y, pt_z, 1)
 
-    arrays_pts = build_random_points_arround_one_point(pt_ini)
-
     dtype = [('X', '<f8'), ('Y', '<f8'), ('Z', '<f8'), ('Classification', 'u1')]
     arrays_las = np.array([pt_ini], dtype=dtype)
 
-    for pt in arrays_pts:
-        arrays_pti = np.array([pt], dtype=dtype)
+    nb_points = randint(20, 50)
+    nb_points_take = 0
+    for i in range(nb_points):
+        pti_x = pt_ini[0] + rand.uniform(-1.5, 1.5)
+        pti_y = pt_ini[1] + rand.uniform(-1.5, 1.5)
+
+        # pdal write takes 2 numbers precision (scale_z=0.01 and offset_z=0 by default)
+        pti_z = round(pt_ini[2] + rand.uniform(-1.5, 1.5), 2)
+        pt_i = (pti_x, pti_y, pti_z, 2)
+
+        arrays_pti = np.array([pt_i], dtype=dtype)
         arrays_las = np.concatenate((arrays_las, arrays_pti), axis=0)
 
-        distance_i_3d = distance3d(pt_ini, pt)
-        if distance_i_3d < distance_radius:
-            nb_points_take_3d += 1
+        nb_points_take += test_function(pt_ini, pt_i)
 
-    array = run_filter(arrays_las, distance_radius, True)
+    return arrays_las, nb_points_take
 
-    nb_pts_radius_3d = 0
-    for pt in array:
-        if pt["radius_search"] > 0:
-            nb_pts_radius_3d += 1
 
+def test_radius_search_3d():
+
+    distance_radius = 1
+
+    def func_test(pt_ini, pt):
+        distance_i = distance3d(pt_ini, pt)
+        if distance_i < distance_radius:
+            return 1
+        return 0
+
+    arrays_las, nb_points_take_3d = build_random_points_around_one_point(func_test)
+    nb_pts_radius_3d = run_filter(arrays_las, distance_radius, True)
     assert nb_pts_radius_3d == nb_points_take_3d
 
 
 def test_radius_search_2d():
 
     distance_radius = 1
-    nb_points_take_2d = 0
 
-    pt_x = 1639825.15
-    pt_y = 1454924.63
-    pt_z = 7072.17
-    pt_ini = (pt_x, pt_y, pt_z, 1)
+    def func_test(pt_ini, pt):
+        distance_i = distance2d(pt_ini, pt)
+        if distance_i < distance_radius:
+            return 1
+        return 0
 
-    arrays_pts = build_random_points_arround_one_point(pt_ini)
-
-    dtype = [('X', '<f8'), ('Y', '<f8'), ('Z', '<f8'), ('Classification', 'u1')]
-    arrays_las = np.array([pt_ini], dtype=dtype)
-
-    for pt in arrays_pts:
-        arrays_pti = np.array([pt], dtype=dtype)
-        arrays_las = np.concatenate((arrays_las, arrays_pti), axis=0)
-
-        distance_i_2d = distance2d(pt_ini, pt)
-        if distance_i_2d < distance_radius:
-            nb_points_take_2d += 1
-
-    array = run_filter(arrays_las, distance_radius, False)
-
-    nb_pts_radius_2d = 0
-    for pt in array:
-        if pt["radius_search"] > 0:
-            nb_pts_radius_2d += 1
-
+    arrays_las, nb_points_take_2d = build_random_points_around_one_point(func_test)
+    nb_pts_radius_2d = run_filter(arrays_las, distance_radius, False)
     assert nb_pts_radius_2d == nb_points_take_2d
 
 
@@ -151,32 +134,13 @@ def test_radius_search_2d_cylinder():
     distance_radius = 1
     distance_cylinder = 0.25
 
-    nb_points_take_2d = 0
-
-    pt_x = 1639825.15
-    pt_y = 1454924.63
-    pt_z = 7072.17
-    pt_ini = (pt_x, pt_y, pt_z, 1)
-
-    arrays_pts = build_random_points_arround_one_point(pt_ini)
-
-    dtype = [('X', '<f8'), ('Y', '<f8'), ('Z', '<f8'), ('Classification', 'u1')]
-    arrays_las = np.array([pt_ini], dtype=dtype)
-
-    for pt in arrays_pts:
-        arrays_pti = np.array([pt], dtype=dtype)
-        arrays_las = np.concatenate((arrays_las, arrays_pti), axis=0)
-
-        distance_i_2d = distance2d(pt_ini, pt)
-        if distance_i_2d < distance_radius:
+    def func_test(pt_ini, pt):
+        distance_i = distance2d(pt_ini, pt)
+        if distance_i < distance_radius:
             if abs(pt_ini[2] - pt[2]) < distance_cylinder:
-                nb_points_take_2d += 1
+                return 1
+        return 0
 
-    array = run_filter(arrays_las, distance_radius, False, distance_cylinder)
-
-    nb_pts_radius_2d = 0
-    for pt in array:
-        if pt["radius_search"] > 0:
-            nb_pts_radius_2d += 1
-
-    assert nb_pts_radius_2d == nb_points_take_2d
+    arrays_las, nb_points_take_2d = build_random_points_around_one_point(func_test)
+    nb_pts_radius_2d_cylinder = run_filter(arrays_las, distance_radius, False, distance_cylinder)
+    assert nb_pts_radius_2d_cylinder == nb_points_take_2d
