@@ -44,6 +44,7 @@ python -m pytest -s
 ## List of Filters
 
 [grid decimation](./doc/grid_decimation.md)
+[radius assign](./doc/radius_assign.md)
 
 ## Adding a filter
 
