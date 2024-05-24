@@ -39,7 +39,7 @@ if __name__ == "__main__":
 
     ## 2 - sélection des points pour DTM et DSM
 
-    # selection de points DTM (max) sur une grille régulière
+    # selection de points sol (max) sur une grille régulière
     pipeline |= pdal.Filter.gridDecimation(resolution=0.5, value="Classification=102", output_type="max", where="Classification==2")
 
     # selection de points DSM (max) sur une grille régulière
@@ -88,7 +88,7 @@ if __name__ == "__main__":
 
     # export des DSM/DTM
     pipeline |= pdal.Writer.gdal(gdaldriver="GTiff", output_type="max", resolution=2.0, filename=args.output_dtm, where=macro.build_condition("Classification", [2,66]))
-    pipeline |= pdal.Writer.gdal(gdaldriver="GTiff", output_type="max", resolution=2.0, filename=args.output_dsm, where=macro.build_condition("Classification", [2,3,4,5,5,17,64]))
+    pipeline |= pdal.Writer.gdal(gdaldriver="GTiff", output_type="max", resolution=2.0, filename=args.output_dsm, where=macro.build_condition("Classification", [2,3,4,5,17,64]))
 
     pipeline.execute()
 
