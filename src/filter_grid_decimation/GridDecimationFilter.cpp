@@ -70,7 +70,7 @@ void GridDecimationFilter::ready(PointTableRef table)
 
 void GridDecimationFilter::addDimensions(PointLayoutPtr layout)
 {
-    m_args->m_dim = layout->registerOrAssignDim(m_args->m_nameOutDimension, Dimension::Type::Double);
+    m_args->m_dim = layout->registerOrAssignDim(m_args->m_nameOutDimension, Dimension::Type::Unsigned8);
 }
 
 void GridDecimationFilter::processOne(BOX2D bounds, PointRef& point, PointViewPtr view)
