@@ -53,8 +53,8 @@ def run_filter(arrays_las, distance_radius, search_3d, distance_cylinder=0. ):
                 "reference_domain": "REF_DOMAIN",
                 "output_dimension": "radius_search",
                 "is3d": search_3d,
-                "is2d_above": distance_cylinder,
-                "is2d_below": distance_cylinder,
+                "max2d_above": distance_cylinder,
+                "max2d_below": distance_cylinder,
             }
         ]
 
