@@ -84,11 +84,10 @@ def build_random_points_around_one_point(test_function):
     nb_points = randint(20, 50)
     nb_points_take = 0
     for i in range(nb_points):
-        pti_x = pt_ini[0] + rand.uniform(-1.5, 1.5)
-        pti_y = pt_ini[1] + rand.uniform(-1.5, 1.5)
-
-        # pdal write takes 2 numbers precision (scale_z=0.01 and offset_z=0 by default)
-        pti_z = round(pt_ini[2] + rand.uniform(-1.5, 1.5), 2)
+        # round at 1 to avoid precision numeric pb
+        pti_x = round(pt_ini[0] + rand.uniform(-1.5, 1.5), 1)
+        pti_y = round(pt_ini[1] + rand.uniform(-1.5, 1.5), 1)
+        pti_z = round(pt_ini[2] + rand.uniform(-1.5, 1.5), 1)
         pt_i = (pti_x, pti_y, pti_z, 2)
 
         arrays_pti = np.array([pt_i], dtype=dtype)
@@ -105,7 +104,7 @@ def test_radius_assign_3d():
 
     def func_test(pt_ini, pt):
         distance_i = distance3d(pt_ini, pt)
-        if distance_i <= distance_radius:
+        if distance_i < distance_radius:
             return 1
         return 0
 
@@ -120,7 +119,7 @@ def test_radius_assign_2d():
 
     def func_test(pt_ini, pt):
         distance_i = distance2d(pt_ini, pt)
-        if distance_i <= distance_radius:
+        if distance_i < distance_radius:
             return 1
         return 0
 
@@ -136,8 +135,8 @@ def test_radius_assign_2d_cylinder():
 
     def func_test(pt_ini, pt):
         distance_i = distance2d(pt_ini, pt)
-        if distance_i <= distance_radius:
-            if abs(pt_ini[2] - pt[2]) < distance_cylinder:
+        if distance_i < distance_radius:
+            if abs(pt_ini[2] - pt[2]) <= distance_cylinder:
                 return 1
         return 0
 
