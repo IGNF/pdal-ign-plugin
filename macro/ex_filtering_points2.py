@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
     # selection de points DSM (max) sur une grille régulière
     pipeline |= pdal.Filter.gridDecimation(resolution=0.5, value="PT_GRID_DSM=1", output_type="max",
-                                           where="(" + macro.build_condition("Classification", [2,3,4,5,6,9,17,64,100]) + ") || PT_GRID_DSM==1")
+                                           where="(" + macro.build_condition("Classification", [2,3,4,5,6,9,17,64]) + ") || PT_GRID_DSM==1")
 
     # assigne des points sol sélectionnés : les points proches de la végétation, des ponts, de l'eau, 64
     pipeline = macro.add_radius_assign(pipeline, 1.5, False, condition_src="PT_GRID_DTM==1",

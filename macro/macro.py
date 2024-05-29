@@ -14,11 +14,11 @@ def add_radius_assign(pipeline, radius, search_3d, condition_src, condition_ref,
     search_3d : the distance reseach is in 3d if True
     condition_src, condition_ref, condition_out : a pdal condition as "Classification==2"
     """
-    pipeline |= pdal.Filter.ferry(dimensions=f"=>REF_DOMAIN, =>SRS_DOMAIN, =>radius_search")
-    pipeline |= pdal.Filter.assign(value=["SRS_DOMAIN = 0", f"SRS_DOMAIN = 1 WHERE {condition_src}",
+    pipeline |= pdal.Filter.ferry(dimensions=f"=>REF_DOMAIN, =>SRC_DOMAIN, =>radius_search")
+    pipeline |= pdal.Filter.assign(value=["SRS_DOMAIN = 0", f"SRC_DOMAIN = 1 WHERE {condition_src}",
                                           "REF_DOMAIN = 0", f"REF_DOMAIN = 1 WHERE {condition_ref}",
                                           "radius_search = 0"])
-    pipeline |= pdal.Filter.radius_assign(radius=radius, src_domain="SRS_DOMAIN",reference_domain="REF_DOMAIN",
+    pipeline |= pdal.Filter.radius_assign(radius=radius, src_domain="SRC_DOMAIN",reference_domain="REF_DOMAIN",
                                           output_dimension="radius_search", is3d=search_3d)
     pipeline |= pdal.Filter.assign(value=condition_out,where="radius_search==1")
     return pipeline
