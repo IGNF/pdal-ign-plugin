@@ -31,7 +31,7 @@ def run_filter(arrays_las, distance_radius, search_3d, distance_cylinder=0. ):
             {"type": "readers.las", "filename": las.name},
             {
                 "type": "filters.ferry",
-                "dimensions": "=>SRS_DOMAIN"
+                "dimensions": "=>SRC_DOMAIN"
             },
             {
                 "type": "filters.ferry",
@@ -49,7 +49,7 @@ def run_filter(arrays_las, distance_radius, search_3d, distance_cylinder=0. ):
             {
                 "type": filter,
                 "radius": distance_radius,
-                "src_domain": "SRS_DOMAIN",
+                "src_domain": "SRC_DOMAIN",
                 "reference_domain": "REF_DOMAIN",
                 "output_dimension": "radius_search",
                 "is3d": search_3d,
