@@ -6,15 +6,14 @@ dependencies:
   - pdal
   - python-pdal
   - gdal
-  - cmake
-  - pip
-  - pip:
-    - ign-pdal-tools
 # --------- dev dep --------- #
+  - cmake
   - pre-commit # hooks for applying linters on commit
   - black # code formatting
   - isort # import sorting
   - flake8 # code analysis
   - pytest
-
-
+# --------- pip & pip librairies --------- #
+  - pip
+  - pip:
+    - ign-pdal-tools
