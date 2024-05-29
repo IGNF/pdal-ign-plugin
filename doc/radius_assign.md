@@ -3,7 +3,9 @@
 Purpose
 ---------------------------------------------------------------------------------------------------------
 
-The **radius assign filter** add a new attribut where the value depends on their neighbors in a given radius: For each point in the domain src_domain_, if it has any neighbor with a distance lower than radius_ that belongs to the domain reference_domain_, it is updated.
+The **radius assign filter**  overwrites the output_dimension_ dimension with boolean values:
+* 1 if the point has any neighbor with a distance lower than radius_ that belongs to the domain reference_domain_
+* 0 otherwise.
 
 
 Example
