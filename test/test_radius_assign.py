@@ -12,11 +12,11 @@ import pytest
 
 
 def distance2d(pt1, pt2):
-    return sqrt((pt1[0] - pt2[0]) ** 2 + (pt1[1] - pt2[1]) ** 2)
+    return round(sqrt((pt1[0] - pt2[0]) ** 2 + (pt1[1] - pt2[1]) ** 2), 2)
 
 
 def distance3d(pt1, pt2):
-    return sqrt((pt1[0] - pt2[0]) ** 2 + (pt1[1] - pt2[1]) ** 2 + (pt1[2] - pt2[2]) ** 2)
+    return round(sqrt((pt1[0] - pt2[0]) ** 2 + (pt1[1] - pt2[1]) ** 2 + (pt1[2] - pt2[2]) ** 2), 2)
 
 def run_filter(arrays_las, distance_radius, search_3d, distance_cylinder=0. ):
 
@@ -40,8 +40,8 @@ def run_filter(arrays_las, distance_radius, search_3d, distance_cylinder=0. ):
             {
                 "type": "filters.assign",
                 "value": [
-                    "SRS_DOMAIN = 1 WHERE Classification==2",
-                    "SRS_DOMAIN = 0 WHERE Classification!=2",
+                    "SRC_DOMAIN = 1 WHERE Classification==2",
+                    "SRC_DOMAIN = 0 WHERE Classification!=2",
                     "REF_DOMAIN = 1 WHERE Classification==1",
                     "REF_DOMAIN = 0 WHERE Classification!=1",
                 ],
@@ -137,7 +137,7 @@ def test_radius_assign_2d_cylinder():
     def func_test(pt_ini, pt):
         distance_i = distance2d(pt_ini, pt)
         if distance_i <= distance_radius:
-            if abs(pt_ini[2] - pt[2]) <= distance_cylinder:
+            if abs(pt_ini[2] - pt[2]) < distance_cylinder:
                 return 1
         return 0
 
