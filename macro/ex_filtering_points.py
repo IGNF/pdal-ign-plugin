@@ -84,7 +84,7 @@ if __name__ == "__main__":
     # step 15 et supression des points ??
 
     # 4 - export du nuage
-    pipeline |= pdal.Writer.las(extra_dims="all",minor_version=4,dataformat_id=6,filename=args.output_las)
+    pipeline |= pdal.Writer.las(extra_dims="all",forward="all",filename=args.output_las)
 
     # export des DSM/DTM
     pipeline |= pdal.Writer.gdal(gdaldriver="GTiff", output_type="max", resolution=2.0, filename=args.output_dtm, where=macro.build_condition("Classification", [2,66]))

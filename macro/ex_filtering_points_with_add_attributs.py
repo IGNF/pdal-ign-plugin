@@ -70,7 +70,7 @@ if __name__ == "__main__":
 
     ## 5 - export du nuage et des DSM
 
-    pipeline |= pdal.Writer.las(extra_dims="all", minor_version=4, dataformat_id=6, filename=args.output_las)
+    pipeline |= pdal.Writer.las(extra_dims="all", forward="all", filename=args.output_las)
     pipeline |= pdal.Writer.gdal(gdaldriver="GTiff", output_type="max", resolution=2.0, filename=args.output_dtm, where="PT_GRID_DTM==1")
     pipeline |= pdal.Writer.gdal(gdaldriver="GTiff", output_type="max", resolution=2.0, filename=args.output_dsm, where="PT_GRID_DSM==1")
 
