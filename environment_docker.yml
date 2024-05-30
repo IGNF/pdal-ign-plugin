@@ -7,7 +7,9 @@ dependencies:
   - python-pdal
   - gdal
   - pytest
+
   # --------- pip & pip libraries --------- #
   - pip
   - pip:
     - ign-pdal-tools
+    
