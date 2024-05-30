@@ -18,7 +18,7 @@ namespace pdal
 
 static StaticPluginInfo const s_info
 {
-    "filters.grid_decimation",
+    "filters.grid_decimation_deprecated", // better to use the pdal gridDecimation plugIN
     "keep max or min points in a grid",
     "",
 };

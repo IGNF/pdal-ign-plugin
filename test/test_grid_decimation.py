@@ -16,7 +16,7 @@ def run_filter(type):
     tmp_out_las = tempfile.NamedTemporaryFile(suffix=".las").name
     tmp_out_wkt = tempfile.NamedTemporaryFile(suffix=".wkt").name
 
-    filter = "filters.grid_decimation"
+    filter = "filters.grid_decimation_deprecated"
     utils.pdal_has_plugin(filter)
 
     bounds = li.las_get_xy_bounds(ini_las)
