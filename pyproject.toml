@@ -1,2 +1,27 @@
+[project]
+name = "pdal_ign_macro"
+dynamic = ["version"]
+dependencies = []
+
+[tool.setuptools.dynamic]
+version = { attr = "macro.version.__version__" }
+
+[tool.setuptools]
+packages = ["macro"]
+
 [tool.black]
 line-length = 99
+include = '\.pyi?$'
+exclude = '''
+/(
+  \.toml
+  |\.sh
+  |\.git
+  |\.ini
+  |\.bat
+  | data
+)/
+'''
+
+[tool.isort]
+profile = "black"

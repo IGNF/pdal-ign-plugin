@@ -1,7 +1,9 @@
 #!/bin/sh
 
+set -e
+
 FILE=~/anaconda3/etc/profile.d/conda.sh
-if [ -e ~/anaconda3/etc/profile.d/conda.sh ] 
+if [ -e ~/anaconda3/etc/profile.d/conda.sh ]
 then
     source ~/anaconda3/etc/profile.d/conda.sh
 elif [ -e ~/miniconda3/etc/profile.d/conda.sh ]
@@ -10,8 +12,8 @@ then
 elif [ -e /usr/share/miniconda/etc/profile.d/conda.sh ]
 then
     source /usr/share/miniconda/etc/profile.d/conda.sh
-elif [ -e ~/miniforge3/etc/profile.d/conda.sh ] 
-then    
+elif [ -e ~/miniforge3/etc/profile.d/conda.sh ]
+then
      source ~/miniforge3/etc/profile.d/conda.sh
 elif [[ -z "${CONDASH}" ]]; then
     echo ERROR: Failed to load conda.sh : ~/anaconda3/etc/profile.d/conda.sh or ~/miniforge3/etc/profile.d/conda.sh or env CONDASH
@@ -28,10 +30,10 @@ echo conda is $CONDA_PREFIX
 
 mkdir build
 cd build
-cmake -G"Unix Makefiles" -DCONDA_PREFIX=$CONDA_PREFIX -DCMAKE_BUILD_TYPE=Release ../ 
+cmake -G"Unix Makefiles" -DCONDA_PREFIX=$CONDA_PREFIX -DCMAKE_BUILD_TYPE=Release ../
 make install
 
 conda deactivate
 
 cd ..
-rm -rf build 
+rm -rf build
