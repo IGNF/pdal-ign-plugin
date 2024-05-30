@@ -13,7 +13,7 @@ dependencies:
   - isort # import sorting
   - flake8 # code analysis
   - pytest
-# --------- pip & pip librairies --------- #
+# --------- pip & pip libraries --------- #
   - pip
   - pip:
     - ign-pdal-tools

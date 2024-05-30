@@ -1,7 +1,7 @@
 name: cicd_test
 
 on:
-  # Run each time some code are push on any branch
+  # Run each time some code is pushed on any branch
   push:
     branches:
       - '**'
@@ -25,8 +25,8 @@ jobs:
         activate-environment: pdal_ign_plugin
         environment-file: ./environment.yml
         auto-activate-base: true
-    
-    - name: compil_plugins
+
+    - name: compile_plugins
       run: source ./ci/build.sh
 
     - name: test

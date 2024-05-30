@@ -10,13 +10,13 @@ def add_radius_assign(pipeline, radius, search_3d, condition_src, condition_ref,
     search points from "condition_src" closed from "condition_ref", and reassign them to "condition_out"
     This combination is equivalent to the CloseBy macro of TerraScan
     radius : the search distance
-    search_3d : the distance reseach is in 3d if True
+    search_3d : the distance research is in 3d if True
     condition_src, condition_ref, condition_out : a pdal condition as "Classification==2"
     """
     pipeline |= pdal.Filter.ferry(dimensions="=>REF_DOMAIN, =>SRC_DOMAIN, =>radius_search")
     pipeline |= pdal.Filter.assign(
         value=[
-            "SRS_DOMAIN = 0",
+            "SRC_DOMAIN = 0",
             f"SRC_DOMAIN = 1 WHERE {condition_src}",
             "REF_DOMAIN = 0",
             f"REF_DOMAIN = 1 WHERE {condition_ref}",
@@ -34,14 +34,14 @@ def add_radius_assign(pipeline, radius, search_3d, condition_src, condition_ref,
     return pipeline
 
 
-def classify_hgt_ground(pipeline, hmin, hmax, condition, condition_out):
+def classify_hgt_ground(pipeline, h_min, h_max, condition, condition_out):
     """
-    reassign points from "condition" between "hmin" and "hmax" of the ground to "condition_out"
+    reassign points from "condition" between "h_min" and "h_max" of the ground to "condition_out"
     This combination is equivalent to the ClassifyHgtGrd macro of TerraScan
     condition, condition_out : a pdal condition as "Classification==2"
     """
     pipeline |= pdal.Filter.hag_delaunay(allow_extrapolation=True)
-    condition_h = f"HeightAboveGround>{hmin} && HeightAboveGround<={hmax}"
+    condition_h = f"HeightAboveGround>{h_min} && HeightAboveGround<={h_max}"
     condition_h += " && " + condition
     pipeline |= pdal.Filter.assign(value=condition_out, where=condition_h)
     return pipeline

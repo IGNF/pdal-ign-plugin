@@ -1,5 +1,7 @@
 xcode
+.vscode
+build
 install
-__pycache__
+*/__pycache__
 test/__pycache_
 test/.idea
