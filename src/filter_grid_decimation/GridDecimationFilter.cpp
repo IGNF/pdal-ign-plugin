@@ -5,7 +5,7 @@
 *
 ****************************************************************************/
 
-#include "grid_decimationFilter.hpp"
+#include "GridDecimationFilter.hpp"
 
 #include <pdal/PointView.hpp>
 #include <pdal/StageFactory.hpp>
@@ -18,7 +18,7 @@ namespace pdal
 
 static StaticPluginInfo const s_info
 {
-    "filters.grid_decimation",
+    "filters.grid_decimation_deprecated", // better to use the pdal gridDecimation plugIN
     "keep max or min points in a grid",
     "",
 };
@@ -39,7 +39,7 @@ void GridDecimationFilter::addArgs(ProgramArgs& args)
 {
     args.add("resolution", "Cell edge size, in units of X/Y",m_args->m_edgeLength, 1.);
     args.add("output_type", "Point keept into the cells ('min', 'max')", m_args->m_methodKeep, "max" );
-    args.add("output_name_attribut", "Name of the add attribut", m_args->m_nameAddAttribut, "grid" );
+    args.add("output_dimension", "Name of the added dimension", m_args->m_nameOutDimension, "grid" );
     args.add("output_wkt", "Export the grid as wkt", m_args->m_nameWktgrid, "" );
 
 }
@@ -61,8 +61,8 @@ void GridDecimationFilter::ready(PointTableRef table)
     if (m_args->m_methodKeep != "max" && m_args->m_methodKeep != "min")
         throwError("The output_type must be 'max' or 'min'.");
     
-    if (m_args->m_nameAddAttribut.empty())
-        throwError("The output_name_attribut must be given.");
+    if (m_args->m_nameOutDimension.empty())
+        throwError("The output_dimension must be given.");
     
     if (!m_args->m_nameWktgrid.empty())
         std::remove(m_args->m_nameWktgrid.c_str());
@@ -70,8 +70,7 @@ void GridDecimationFilter::ready(PointTableRef table)
 
 void GridDecimationFilter::addDimensions(PointLayoutPtr layout)
 {
-    m_args->m_dim = layout->registerOrAssignDim(m_args->m_nameAddAttribut,
-            Dimension::Type::Double);
+    m_args->m_dim = layout->registerOrAssignDim(m_args->m_nameOutDimension, Dimension::Type::Unsigned8);
 }
 
 void GridDecimationFilter::processOne(BOX2D bounds, PointRef& point, PointViewPtr view)
@@ -81,8 +80,8 @@ void GridDecimationFilter::processOne(BOX2D bounds, PointRef& point, PointViewPt
     double y = point.getFieldAs<double>(Dimension::Id::Y);
     int id = point.getFieldAs<double>(Dimension::Id::PointId);
 
-    double d_width_pt = std::floor((x - bounds.minx) / m_args->m_edgeLength) + 1;
-    double d_height_pt = std::floor((y - bounds.miny) / m_args->m_edgeLength) + 1;
+    double d_width_pt = std::ceil((x - bounds.minx) / m_args->m_edgeLength);
+    double d_height_pt = std::ceil((y - bounds.miny) / m_args->m_edgeLength);
 
     int width = static_cast<int>(d_width_pt);
     int height = static_cast<int>(d_height_pt);
@@ -108,8 +107,8 @@ void GridDecimationFilter::processOne(BOX2D bounds, PointRef& point, PointViewPt
 
 void GridDecimationFilter::createGrid(BOX2D bounds)
 {
-    double d_width = std::floor((bounds.maxx - bounds.minx) / m_args->m_edgeLength) + 1;
-    double d_height = std::floor((bounds.maxy - bounds.miny) / m_args->m_edgeLength) + 1;
+    double d_width = std::ceil((bounds.maxx - bounds.minx) / m_args->m_edgeLength);
+    double d_height = std::ceil((bounds.maxy - bounds.miny) / m_args->m_edgeLength);
     
     if (d_width < 0.0 || d_width > (std::numeric_limits<int>::max)())
         throwError("Grid width out of range.");

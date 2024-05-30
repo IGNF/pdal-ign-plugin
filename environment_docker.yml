@@ -1,6 +1,13 @@
 name: pdal_ign_plugin
 channels:
   - conda-forge
+  - anaconda
 dependencies:
   - pdal
+  - python-pdal
+  - gdal
+# --------- pip & pip librairies --------- #
+  - pip
+  - pip:
+    - ign-pdal-tools
 

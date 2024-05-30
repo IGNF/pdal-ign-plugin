@@ -45,6 +45,8 @@ python -m pytest -s
 
 [grid decimation](./doc/grid_decimation.md)
 
+[radius assign](./doc/radius_assign.md)
+
 ## Adding a filter
 
 In order to add a filter, you have to add a new folder in the src directory : 

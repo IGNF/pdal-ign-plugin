@@ -1,14 +1,19 @@
 name: pdal_ign_plugin
 channels:
   - conda-forge
+  - anaconda
 dependencies:
   - pdal
   - python-pdal
+  - gdal
+# --------- dev dep --------- #
+  - cmake
+  - pre-commit # hooks for applying linters on commit
+  - black # code formatting
+  - isort # import sorting
+  - flake8 # code analysis
   - pytest
-  - black
-  - isort
-  - shapely
+# --------- pip & pip librairies --------- #
+  - pip
   - pip:
     - ign-pdal-tools
-
-

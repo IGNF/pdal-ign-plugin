@@ -1,7 +1,7 @@
 
-file( GLOB_RECURSE GD_SRCS ${CMAKE_SOURCE_DIR} *)
-
-message("GD_SRCS ${GD_SRCS}")
+file( GLOB_RECURSE GD_SRCS 
+	${CMAKE_SOURCE_DIR}/src/filter_grid_decimation/*.hpp
+	${CMAKE_SOURCE_DIR}/src/filter_grid_decimation/*.cpp)
 
 PDAL_CREATE_PLUGIN(
     TYPE filter
