@@ -62,7 +62,7 @@ void GridDecimationFilter::ready(PointTableRef table)
         throwError("The output_type must be 'max' or 'min'.");
     
     if (m_args->m_nameOutDimension.empty())
-        throwError("The output_name_attribut must be given.");
+        throwError("The output_dimension must be given.");
     
     if (!m_args->m_nameWktgrid.empty())
         std::remove(m_args->m_nameWktgrid.c_str());

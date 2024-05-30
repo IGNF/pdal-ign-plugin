@@ -14,7 +14,7 @@ namespace pdal
 
 static PluginInfo const s_info = PluginInfo(
     "filters.radius_assign",
-    "Re-assign some point attributes based on KNN voting",
+    "Re-assign some point dimension based on KNN voting",
     "" );
 
 CREATE_SHARED_STAGE(RadiusAssignFilter, s_info)
@@ -55,7 +55,7 @@ void RadiusAssignFilter::initialize()
     if (m_args->m_radius <= 0)
         throwError("Invalid 'radius' option: " + std::to_string(m_args->m_radius) + ", must be > 0");
     if (m_args->m_outputDimension.empty())
-        throwError("The output_name_attribut must be given.");
+        throwError("The output_dimension must be given.");
 }
 
 void RadiusAssignFilter::prepared(PointTableRef table)

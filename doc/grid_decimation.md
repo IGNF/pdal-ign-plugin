@@ -5,7 +5,7 @@
 Purpose
 ---------------------------------------------------------------------------------------------------------
 
-The **grid decimation filter** transform only one point in each cells of a grid calculated from the points cloud and a resolution therm. The transformation is done by the value information. The selected point could be the highest or the lowest point on the cell. It can be used, for exemple, to quickly filter vegetation points in order to keep only the canopy points. A new attribut is created with the value '1' for the grid, and '0' for the other points.
+The **grid decimation filter** transform only one point in each cells of a grid calculated from the points cloud and a resolution therm. The transformation is done by the value information. The selected point could be the highest or the lowest point on the cell. It can be used, for exemple, to quickly filter vegetation points in order to keep only the canopy points. A new dimension is created with the value '1' for the grid, and '0' for the other points.
 
 
 Example
@@ -20,7 +20,7 @@ This example transform highest points of classification 5 in classification 9, o
     {
         "type": "filters.gridDecimation",
 	"output_type":"max",
-        "output_name_attribut": "grid",
+        "output_dimension": "grid",
 	"output_wkt":"file-output.wkt"
     },
     {

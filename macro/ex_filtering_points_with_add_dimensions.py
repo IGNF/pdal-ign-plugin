@@ -7,7 +7,7 @@ This tool shows how to use functions of macro in a pdal pipeline
 """
 
 def parse_args():
-    parser = argparse.ArgumentParser("Tool to apply pdal pipelines for DSM and DTM calculation (with add attributs for the concerned points)")
+    parser = argparse.ArgumentParser("Tool to apply pdal pipelines for DSM and DTM calculation (with add dimensions for the concerned points)")
     parser.add_argument("--input", "-i", type=str, required=True, help="Input las file")
     parser.add_argument("--output_las", "-o", type=str, required=True, help="Output cloud las file")
     parser.add_argument("--output_dsm", "-s", type=str, required=True, help="Output dsm tiff file")
@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
     pipeline = pdal.Reader.las(args.input)
 
-    # 0 - ajout d'attributs temporaires
+    # 0 - ajout de dimensions temporaires
     pipeline |= pdal.Filter.ferry(dimensions=f"=>PT_GRID_DSM, =>PT_VEG_DSM, =>PT_GRID_DTM, =>PT_ON_BRIDGE")
 
 
@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
     # selection de points DSM (max) sur une grille régulière
     pipeline |= pdal.Filter.gridDecimation(resolution=0.5, value="PT_GRID_DSM=1", output_type="max",
-                                           where="(" + macro.build_condition("Classification", [2,3,4,5,6,9,17,64]) + ") || PT_GRID_DSM==1")
+                                           where="(" + macro.build_condition("Classification", [6,9,17,64]) + ") || PT_GRID_DSM==1")
 
     # assigne des points sol sélectionnés : les points proches de la végétation, des ponts, de l'eau, 64
     pipeline = macro.add_radius_assign(pipeline, 1.5, False, condition_src="PT_GRID_DTM==1",
@@ -62,11 +62,11 @@ if __name__ == "__main__":
     pipeline = macro.add_radius_assign(pipeline, 1.5, False, condition_src=macro.build_condition("Classification", [2,3,4,5,9]), condition_ref="Classification==17", condition_out="PT_ON_BRIDGE=1")
     pipeline = macro.add_radius_assign(pipeline, 1.5, False, condition_src="PT_ON_BRIDGE==1",
                                        condition_ref=macro.build_condition("Classification", [2,3,4,5]), condition_out="PT_ON_BRIDGE=0")
-    pipeline |= pdal.Filter.assign(value=["PT_GRID_DSM = 0 WHERE " + macro.build_condition("Classification", [2,3,4,5,9]) + " && PT_ON_BRIDGE==1"])
+    pipeline |= pdal.Filter.assign(value=["PT_GRID_DSM=0 WHERE PT_ON_BRIDGE==1"])
 
 
     ## 4 - point pour DTM servent au DSM également
-    pipeline |= pdal.Filter.assign(value=["PT_GRID_DSM = 1 WHERE PT_GRID_DTM==1"])
+    pipeline |= pdal.Filter.assign(value=["PT_GRID_DSM=1 WHERE PT_GRID_DTM==1"])
 
     ## 5 - export du nuage et des DSM
 
