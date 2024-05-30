@@ -74,7 +74,7 @@ The name of the folder informs of the plugIN nature (reader, writer, filter).
 The code should respect the documentation proposed by pdal: [build a pdal plugin](https://pdal.io/en/2.6.0/development/plugins.html).
 Be careful to change if the plugIn is a reader, a writer or a filter.
 
-The CMakeList should contains:
+The CMakeList should contain:
 
 ```
 file( GLOB_RECURSE GD_SRCS ${CMAKE_SOURCE_DIR} *)
@@ -90,7 +90,6 @@ install(TARGETS pdal_plugin_filter_my_new_PI)
 ```
 
 You should complete the main CMakeList by adding the new plugIN:
-
 ```
 add_subdirectory(src/filter_my_new_PI)
 ```

@@ -9,7 +9,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y cmake make buil
 
 COPY src src
 COPY CMakeLists.txt CMakeLists.txt
-
 RUN cmake -G"Unix Makefiles" -DCONDA_PREFIX=$CONDA_PREFIX -DCMAKE_BUILD_TYPE=Release
 RUN make -j4 install
 
