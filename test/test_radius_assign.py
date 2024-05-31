@@ -14,13 +14,15 @@ pt_ini = (pt_x, pt_y, pt_z, 1)
 
 numeric_precision = 4
 
+
 def distance2d(pt1, pt2):
     return round(math.sqrt((pt1[0] - pt2[0]) ** 2 + (pt1[1] - pt2[1]) ** 2), numeric_precision)
 
 
 def distance3d(pt1, pt2):
     return round(
-        math.sqrt((pt1[0] - pt2[0]) ** 2 + (pt1[1] - pt2[1]) ** 2 + (pt1[2] - pt2[2]) ** 2), numeric_precision
+        math.sqrt((pt1[0] - pt2[0]) ** 2 + (pt1[1] - pt2[1]) ** 2 + (pt1[2] - pt2[2]) ** 2),
+        numeric_precision,
     )
 
 
@@ -81,7 +83,7 @@ def build_random_points_around_one_point(test_function, distance_radius):
     arrays_las = np.concatenate((arrays_las, arrays_pti), axis=0)
     nb_points_take = test_function(pt_limit)
 
-    pt_limit = (pt_x + distance_radius+1/numeric_precision, pt_y, pt_z, 2)
+    pt_limit = (pt_x + distance_radius + 1 / numeric_precision, pt_y, pt_z, 2)
     arrays_pti = np.array([pt_limit], dtype=dtype)
     arrays_las = np.concatenate((arrays_las, arrays_pti), axis=0)
     nb_points_take += test_function(pt_limit)
@@ -95,8 +97,10 @@ def build_random_points_around_one_point(test_function, distance_radius):
         pt_i = (pti_x, pti_y, pti_z, 2)
 
         # trop d'incertitude entre les precisions numériques de pdal et des tests
-        if abs(distance2d(pt_i, pt_ini) - distance_radius)<numeric_precision: continue
-        if abs(distance3d(pt_i, pt_ini) - distance_radius)<numeric_precision: continue
+        if abs(distance2d(pt_i, pt_ini) - distance_radius) < numeric_precision:
+            continue
+        if abs(distance3d(pt_i, pt_ini) - distance_radius) < numeric_precision:
+            continue
 
         arrays_pti = np.array([pt_i], dtype=dtype)
         arrays_las = np.concatenate((arrays_las, arrays_pti), axis=0)
@@ -116,7 +120,9 @@ def test_radius_assign_3d():
             return 1
         return 0
 
-    arrays_las, nb_points_take_3d = build_random_points_around_one_point(func_test, distance_radius)
+    arrays_las, nb_points_take_3d = build_random_points_around_one_point(
+        func_test, distance_radius
+    )
     nb_pts_radius_3d = run_filter(arrays_las, distance_radius, True)
     assert nb_pts_radius_3d == nb_points_take_3d
 
@@ -131,7 +137,9 @@ def test_radius_assign_2d():
             return 1
         return 0
 
-    arrays_las, nb_points_take_2d = build_random_points_around_one_point(func_test, distance_radius)
+    arrays_las, nb_points_take_2d = build_random_points_around_one_point(
+        func_test, distance_radius
+    )
     nb_pts_radius_2d = run_filter(arrays_las, distance_radius, False)
     assert nb_pts_radius_2d == nb_points_take_2d
 
@@ -148,6 +156,8 @@ def test_radius_assign_2d_cylinder():
                 return 1
         return 0
 
-    arrays_las, nb_points_take_2d = build_random_points_around_one_point(func_test, distance_radius)
+    arrays_las, nb_points_take_2d = build_random_points_around_one_point(
+        func_test, distance_radius
+    )
     nb_pts_radius_2d_cylinder = run_filter(arrays_las, distance_radius, False, distance_cylinder)
     assert nb_pts_radius_2d_cylinder == nb_points_take_2d
