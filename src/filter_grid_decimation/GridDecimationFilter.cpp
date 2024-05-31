@@ -80,9 +80,8 @@ void GridDecimationFilter::processOne(BOX2D bounds, PointRef& point, PointViewPt
     double y = point.getFieldAs<double>(Dimension::Id::Y);
     int id = point.getFieldAs<double>(Dimension::Id::PointId);
      
-    // if x==xmax of the cell, the point are in the bottom cell
-    // if y==ymax of the cell, the point are in the right cell
-
+    // if x==(xmax of the cell), the point are in the bottom cell
+    // if y==(ymax of the cell), the point are in the right cell
     double d_width_pt = (x - bounds.minx) / m_args->m_edgeLength;
     double d_height_pt = (y - bounds.miny) / m_args->m_edgeLength;
 
@@ -90,6 +89,7 @@ void GridDecimationFilter::processOne(BOX2D bounds, PointRef& point, PointViewPt
     int height = static_cast<int>(d_height_pt);
 
     auto mptRefid = this->grid.find( std::make_pair(width,height) );
+    assert( mptRefid != this->grid.end() );
     auto ptRefid = mptRefid->second;
     
     if (ptRefid==-1)
