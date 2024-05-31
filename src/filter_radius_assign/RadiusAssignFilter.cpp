@@ -94,6 +94,7 @@ void RadiusAssignFilter::doOneNoDomain(PointRef &point)
         }
     }
     
+    std::cout << "point take " << std::fixed << std::setprecision(4) << point.getFieldAs<double>(Dimension::Id::X) << " " << point.getFieldAs<double>(Dimension::Id::Y) << " " << point.getFieldAs<double>(Dimension::Id::Z) << std::endl;
     m_args->m_ptsToUpdate.push_back(point.pointId());
 }
 
