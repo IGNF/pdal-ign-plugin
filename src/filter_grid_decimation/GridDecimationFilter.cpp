@@ -79,15 +79,19 @@ void GridDecimationFilter::processOne(BOX2D bounds, PointRef& point, PointViewPt
     double x = point.getFieldAs<double>(Dimension::Id::X);
     double y = point.getFieldAs<double>(Dimension::Id::Y);
     int id = point.getFieldAs<double>(Dimension::Id::PointId);
+     
+    // if x==xmax of the cell, the point are in the bottom cell
+    // if y==ymax of the cell, the point are in the right cell
 
-    double d_width_pt = std::ceil((x - bounds.minx) / m_args->m_edgeLength);
-    double d_height_pt = std::ceil((y - bounds.miny) / m_args->m_edgeLength);
+    double d_width_pt = (x - bounds.minx) / m_args->m_edgeLength;
+    double d_height_pt = (y - bounds.miny) / m_args->m_edgeLength;
 
     int width = static_cast<int>(d_width_pt);
     int height = static_cast<int>(d_height_pt);
 
-    auto ptRefid = this->grid[ std::make_pair(width,height) ];
-
+    auto mptRefid = this->grid.find( std::make_pair(width,height) );
+    auto ptRefid = mptRefid->second;
+    
     if (ptRefid==-1)
     {
         this->grid[ std::make_pair(width,height) ] = point.pointId();
@@ -107,8 +111,8 @@ void GridDecimationFilter::processOne(BOX2D bounds, PointRef& point, PointViewPt
 
 void GridDecimationFilter::createGrid(BOX2D bounds)
 {
-    double d_width = std::ceil((bounds.maxx - bounds.minx) / m_args->m_edgeLength);
-    double d_height = std::ceil((bounds.maxy - bounds.miny) / m_args->m_edgeLength);
+    double d_width = std::round((bounds.maxx - bounds.minx) / m_args->m_edgeLength);
+    double d_height = std::round((bounds.maxy - bounds.miny) / m_args->m_edgeLength);
     
     if (d_width < 0.0 || d_width > (std::numeric_limits<int>::max)())
         throwError("Grid width out of range.");
@@ -123,7 +127,7 @@ void GridDecimationFilter::createGrid(BOX2D bounds)
     for (size_t l(0); l<height; l++)
         for (size_t c(0); c<width; c++)
         {
-            BOX2D bounds_dalle ( bounds.minx + c*m_args->m_edgeLength, bounds.miny + l*m_args->m_edgeLength,
+            BOX2D bounds_dalle (bounds.minx + c*m_args->m_edgeLength, bounds.miny + l*m_args->m_edgeLength,
                                 bounds.minx + (c+1)*m_args->m_edgeLength, bounds.miny + (l+1)*m_args->m_edgeLength );
             vgrid.push_back(Polygon(bounds_dalle));
             this->grid.insert( std::make_pair( std::make_pair(c,l), -1)  );
@@ -143,7 +147,7 @@ PointViewSet GridDecimationFilter::run(PointViewPtr view)
     BOX2D bounds;
     view->calculateBounds(bounds);
     createGrid(bounds);
-    
+
     for (PointId i = 0; i < view->size(); ++i)
     {
         PointRef point = view->point(i);
