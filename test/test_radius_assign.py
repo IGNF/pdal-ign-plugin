@@ -1,24 +1,24 @@
 import json
+import math
+import random as rand
 import tempfile
 from test import utils
 
-from random import *
 import numpy as np
 import pdal
-import random as rand
-from math import *
-
-import pytest
 
 
 def distance2d(pt1, pt2):
-    return round(sqrt((pt1[0] - pt2[0]) ** 2 + (pt1[1] - pt2[1]) ** 2), 2)
+    return round(math.sqrt((pt1[0] - pt2[0]) ** 2 + (pt1[1] - pt2[1]) ** 2), 2)
 
 
 def distance3d(pt1, pt2):
-    return round(sqrt((pt1[0] - pt2[0]) ** 2 + (pt1[1] - pt2[1]) ** 2 + (pt1[2] - pt2[2]) ** 2), 2)
+    return round(
+        math.sqrt((pt1[0] - pt2[0]) ** 2 + (pt1[1] - pt2[1]) ** 2 + (pt1[2] - pt2[2]) ** 2), 2
+    )
 
-def run_filter(arrays_las, distance_radius, search_3d, distance_cylinder=0. ):
+
+def run_filter(arrays_las, distance_radius, search_3d, distance_cylinder=0.0):
 
     filter = "filters.radius_assign"
     utils.pdal_has_plugin(filter)
@@ -29,14 +29,8 @@ def run_filter(arrays_las, distance_radius, search_3d, distance_cylinder=0. ):
 
         PIPELINE = [
             {"type": "readers.las", "filename": las.name},
-            {
-                "type": "filters.ferry",
-                "dimensions": "=>SRC_DOMAIN"
-            },
-            {
-                "type": "filters.ferry",
-                "dimensions": "=>REF_DOMAIN"
-            },
+            {"type": "filters.ferry", "dimensions": "=>SRC_DOMAIN"},
+            {"type": "filters.ferry", "dimensions": "=>REF_DOMAIN"},
             {
                 "type": "filters.assign",
                 "value": [
@@ -55,7 +49,7 @@ def run_filter(arrays_las, distance_radius, search_3d, distance_cylinder=0. ):
                 "is3d": search_3d,
                 "max2d_above": distance_cylinder,
                 "max2d_below": distance_cylinder,
-            }
+            },
         ]
 
         pipeline = pdal.Pipeline(json.dumps(PIPELINE))
@@ -78,10 +72,10 @@ def build_random_points_around_one_point(test_function):
     pt_z = 7072.17
     pt_ini = (pt_x, pt_y, pt_z, 1)
 
-    dtype = [('X', '<f8'), ('Y', '<f8'), ('Z', '<f8'), ('Classification', 'u1')]
+    dtype = [("X", "<f8"), ("Y", "<f8"), ("Z", "<f8"), ("Classification", "u1")]
     arrays_las = np.array([pt_ini], dtype=dtype)
 
-    nb_points = randint(20, 50)
+    nb_points = rand.randint(20, 50)
     nb_points_take = 0
     for i in range(nb_points):
         # round at 1 to avoid precision numeric pb

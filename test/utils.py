@@ -1,8 +1,6 @@
 import os
 import subprocess
 
-import pdal
-
 
 def pdal_has_plugin(name_filter):
     print("init pdal driver : ", os.environ["PDAL_DRIVER_PATH"])
