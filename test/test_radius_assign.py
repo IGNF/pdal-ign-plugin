@@ -124,8 +124,7 @@ def test_radius_assign_3d():
         func_test, distance_radius
     )
     nb_pts_radius_3d = run_filter(arrays_las, distance_radius, True)
-    # fix in other PR
-    #assert nb_pts_radius_3d == nb_points_take_3d
+    assert nb_pts_radius_3d == nb_points_take_3d
 
 
 def test_radius_assign_2d():
@@ -142,8 +141,7 @@ def test_radius_assign_2d():
         func_test, distance_radius
     )
     nb_pts_radius_2d = run_filter(arrays_las, distance_radius, False)
-    # fix in other PR
-    #assert nb_pts_radius_2d == nb_points_take_2d
+    assert nb_pts_radius_2d == nb_points_take_2d
 
 
 def test_radius_assign_2d_cylinder():
@@ -162,5 +160,4 @@ def test_radius_assign_2d_cylinder():
         func_test, distance_radius
     )
     nb_pts_radius_2d_cylinder = run_filter(arrays_las, distance_radius, False, distance_cylinder)
-    #fix in other PR
-    #assert nb_pts_radius_2d_cylinder == nb_points_take_2d
+    assert nb_pts_radius_2d_cylinder == nb_points_take_2d
