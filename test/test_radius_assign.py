@@ -91,12 +91,12 @@ def build_random_points_around_one_point(test_function, distance_radius):
     nb_points = rand.randint(20, 50)
     for i in range(nb_points):
         # round at 1 to avoid precision numeric pb
-        pti_x = round(pt_ini[0] + rand.uniform(-1.5, 1.5), 1)
-        pti_y = round(pt_ini[1] + rand.uniform(-1.5, 1.5), 1)
-        pti_z = round(pt_ini[2] + rand.uniform(-1.5, 1.5), 1)
+        pti_x = pt_ini[0] + rand.uniform(-1.5, 1.5)
+        pti_y = pt_ini[1] + rand.uniform(-1.5, 1.5)
+        pti_z = pt_ini[2] + rand.uniform(-1.5, 1.5)
         pt_i = (pti_x, pti_y, pti_z, 2)
 
-        # trop d'incertitude entre les precisions numériques de pdal et des tests
+        # too much uncertainty between the digital precisions of pdal and the tests
         if abs(distance2d(pt_i, pt_ini) - distance_radius) < numeric_precision:
             continue
         if abs(distance3d(pt_i, pt_ini) - distance_radius) < numeric_precision:
