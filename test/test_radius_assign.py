@@ -6,6 +6,7 @@ from test import utils
 
 import numpy as np
 import pdal
+import pytest
 
 pt_x = 1639825.1
 pt_y = 1454924.6
@@ -26,7 +27,7 @@ def distance3d(pt1, pt2):
     )
 
 
-def run_filter(arrays_las, distance_radius, search_3d, distance_cylinder=0.0):
+def run_filter(arrays_las, distance_radius, search_3d, limit_z_above=-1, limit_w_below=-1):
 
     filter = "filters.radius_assign"
     utils.pdal_has_plugin(filter)
@@ -55,8 +56,8 @@ def run_filter(arrays_las, distance_radius, search_3d, distance_cylinder=0.0):
                 "reference_domain": "REF_DOMAIN",
                 "output_dimension": "radius_search",
                 "is3d": search_3d,
-                "max2d_above": distance_cylinder,
-                "max2d_below": distance_cylinder,
+                "max2d_above": limit_z_above,
+                "max2d_below": limit_w_below,
             },
         ]
 
@@ -144,20 +145,35 @@ def test_radius_assign_2d():
     assert nb_pts_radius_2d == nb_points_take_2d
 
 
-def test_radius_assign_2d_cylinder():
+@pytest.mark.parametrize(
+    "limit_z_above, limit_z_below",
+    [
+        (-1, -1),  # no limit
+        (-1, 2),  # limit below only
+        (2, -1),  # limit above only
+        (0, -1),  # take all points below only
+        (-1, 0),  # take all points above only
+    ],
+)
+def test_radius_assign_2d_cylinder(limit_z_above, limit_z_below):
 
     distance_radius = 1
-    distance_cylinder = 0.25
+    limit_z_above = 0.25
+    limit_z_below = 0.25
 
     def func_test(pt):
         distance_i = distance2d(pt_ini, pt)
         if distance_i < distance_radius:
-            if abs(pt_ini[2] - pt[2]) <= distance_cylinder:
+            if (limit_z_above >= 0) and ((pt[2] - pt_ini[2]) <= limit_z_above):
+                return 1
+            if (limit_z_below >= 0) and ((pt_ini[2] - pt[2]) <= limit_z_below):
                 return 1
         return 0
 
     arrays_las, nb_points_take_2d = build_random_points_around_one_point(
         func_test, distance_radius
     )
-    nb_pts_radius_2d_cylinder = run_filter(arrays_las, distance_radius, False, distance_cylinder)
+    nb_pts_radius_2d_cylinder = run_filter(
+        arrays_las, distance_radius, False, limit_z_above, limit_z_below
+    )
     assert nb_pts_radius_2d_cylinder == nb_points_take_2d

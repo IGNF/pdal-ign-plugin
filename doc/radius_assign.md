@@ -45,7 +45,7 @@ Options
 
 **is3d**: Search in 3d (as a ball). [Default: false]
 
-**max2d_above**: If search in 2d : upward maximum distance in Z for potential neighbors (corresponds to a search in a cylinder with a height = max2d_above above the source point). Default (0) = infinite height [Default: 0.]
+**max2d_above**: If search in 2d : upward maximum distance in Z for potential neighbors (corresponds to a search in a cylinder with a height = max2d_above above the source point). Values < 0 mean infinite height [Default: -1.]
 
-**max2d_below**: If search in 2d : upward maximum distance in Z for potential neighbors (corresponds to a search in a cylinder with a height = max2d_below below the source point). Default (0) = infinite height [Default: 0.]
+**max2d_below**: If search in 2d : upward maximum distance in Z for potential neighbors (corresponds to a search in a cylinder with a height = max2d_below below the source point). Values < 0 mean infinite height [Default: -1.]
 
