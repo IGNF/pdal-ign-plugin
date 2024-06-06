@@ -15,7 +15,7 @@ def parse_args():
         "Tool to apply pdal pipelines to select points for DSM and DTM calculation"
         + "(add dimensions with positive values for the selected points)"
     )
-    parser.add_argument("--input", "-i", type=str, required=True, help="Input las file")
+    parser.add_argument("--input_las", "-i", type=str, required=True, help="Input las file")
     parser.add_argument(
         "--output_las", "-o", type=str, required=True, help="Output cloud las file"
     )
@@ -42,18 +42,11 @@ def parse_args():
     return parser.parse_args()
 
 
-if __name__ == "__main__":
-    args = parse_args()
-
-    pipeline = pdal.Pipeline() | pdal.Reader.las(args.input)
-    dsm_dim = args.dsm_dimension
-    dtm_dim = args.dtm_dimension
-
-    # Récupération des dimensions du fichier en entrée
-    input_dimensions = pipeline.quickinfo["readers.las"]["dimensions"].split(", ")
+def main(input_las, output_las, dsm_dimension, dtm_dimension, output_dsm, output_dtm):
+    pipeline = pdal.Pipeline() | pdal.Reader.las(input_las)
 
     # 0 - ajout de dimensions temporaires et de sortie
-    added_dimensions = [dtm_dim, dsm_dim, "PT_VEG_DSM", "PT_ON_BRIDGE"]
+    added_dimensions = [dtm_dimension, dsm_dimension, "PT_VEG_DSM", "PT_ON_BRIDGE"]
     pipeline |= pdal.Filter.ferry(dimensions="=>" + ", =>".join(added_dimensions))
 
     # 1 - recherche des points max de végétation (4,5) sur une grille régulière, avec prise en
@@ -95,22 +88,24 @@ if __name__ == "__main__":
 
     # max des points de veget (PT_VEG_DSM==1) sur une grille régulière :
     pipeline |= pdal.Filter.gridDecimation(
-        resolution=0.75, value=f"{dsm_dim}=1", output_type="max", where="PT_VEG_DSM==1"
+        resolution=0.75, value=f"{dsm_dimension}=1", output_type="max", where="PT_VEG_DSM==1"
     )
 
     # 2 - sélection des points pour DTM et DSM
 
     # selection de points DTM (max) sur une grille régulière
     pipeline |= pdal.Filter.gridDecimation(
-        resolution=0.5, value=f"{dtm_dim}=1", output_type="max", where="Classification==2"
+        resolution=0.5, value=f"{dtm_dimension}=1", output_type="max", where="Classification==2"
     )
 
     # selection de points DSM (max) sur une grille régulière
     pipeline |= pdal.Filter.gridDecimation(
         resolution=0.5,
-        value=f"{dsm_dim}=1",
+        value=f"{dsm_dimension}=1",
         output_type="max",
-        where="(" + macro.build_condition("Classification", [6, 9, 17, 64]) + f") || {dsm_dim}==1",
+        where="("
+        + macro.build_condition("Classification", [6, 9, 17, 64])
+        + f") || {dsm_dimension}==1",
     )
 
     # assigne des points sol sélectionnés : les points proches de la végétation, des ponts, de l'eau, 64
@@ -118,9 +113,9 @@ if __name__ == "__main__":
         pipeline,
         1.5,
         False,
-        condition_src=f"{dtm_dim}==1",
+        condition_src=f"{dtm_dimension}==1",
         condition_ref=macro.build_condition("Classification", [4, 5, 6, 9, 17, 64]),
-        condition_out=f"{dsm_dim}=1",
+        condition_out=f"{dsm_dimension}=1",
     )
 
     # 3 - gestion des ponts
@@ -145,32 +140,37 @@ if __name__ == "__main__":
         condition_ref=macro.build_condition("Classification", [2, 3, 4, 5]),
         condition_out="PT_ON_BRIDGE=0",
     )
-    pipeline |= pdal.Filter.assign(value=[f"{dsm_dim}=0 WHERE PT_ON_BRIDGE==1"])
+    pipeline |= pdal.Filter.assign(value=[f"{dsm_dimension}=0 WHERE PT_ON_BRIDGE==1"])
 
     # 4 - point pour DTM servent au DSM également
-    pipeline |= pdal.Filter.assign(value=[f"{dsm_dim}=1 WHERE {dtm_dim}==1"])
+    pipeline |= pdal.Filter.assign(value=[f"{dsm_dimension}=1 WHERE {dtm_dimension}==1"])
 
     # 5 - export du nuage et des DSM
     # TODO: n'ajouter que les dimensions de sortie utiles !
 
-    pipeline |= pdal.Writer.las(extra_dims="all", forward="all", filename=args.output_las)
+    pipeline |= pdal.Writer.las(extra_dims="all", forward="all", filename=output_las)
 
-    if args.output_dtm:
+    if output_dtm:
         pipeline |= pdal.Writer.gdal(
             gdaldriver="GTiff",
             output_type="max",
             resolution=2.0,
-            filename=args.output_dtm,
-            where=f"{dtm_dim}==1",
+            filename=output_dtm,
+            where=f"{dtm_dimension}==1",
         )
 
-    if args.output_dsm:
+    if output_dsm:
         pipeline |= pdal.Writer.gdal(
             gdaldriver="GTiff",
             output_type="max",
             resolution=2.0,
-            filename=args.output_dsm,
-            where=f"{dsm_dim}==1",
+            filename=output_dsm,
+            where=f"{dsm_dimension}==1",
         )
 
     pipeline.execute()
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    main(**args)
