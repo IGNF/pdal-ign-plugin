@@ -3,14 +3,16 @@ import json
 import math
 import tempfile
 from test import utils
-import pytest
 
 import pdal
 import pdaltools.las_info as li
+import pytest
+
 
 def contains(bounds, x, y):
-    #to be coherent with the grid decimation algorithm
+    # to be coherent with the grid decimation algorithm
     return bounds[0] <= x and x < bounds[1] and bounds[2] <= y and y < bounds[3]
+
 
 def run_filter(type, resolution):
 
@@ -52,11 +54,15 @@ def run_filter(type, resolution):
 
     assert nb_pts_grid == nb_dalle
 
-    for l in range(d_height):
-        for c in range(d_width):
+    for lig in range(d_height):
+        for col in range(d_width):
 
-            cell = [bounds[0][0] + c*resolution, bounds[0][0] + (c+1)*resolution,
-                      bounds[1][0] + l*resolution, bounds[1][0] + (l+1)*resolution]
+            cell = [
+                bounds[0][0] + col * resolution,
+                bounds[0][0] + (col + 1) * resolution,
+                bounds[1][0] + lig * resolution,
+                bounds[1][0] + (lig + 1) * resolution,
+            ]
 
             nbThreadPtsCrop = 0
             ZRef = 0
@@ -78,10 +84,10 @@ def run_filter(type, resolution):
 
                 if pt["grid"] > 0:
                     nbThreadPtsCrop += 1
-                    ZRefGrid=z
+                    ZRefGrid = z
 
-            assert(nbThreadPtsCrop == 1)
-            assert(ZRef == ZRefGrid)
+            assert nbThreadPtsCrop == 1
+            assert ZRef == ZRefGrid
 
     data = []
     with open(tmp_out_wkt, "r") as f:
@@ -91,24 +97,18 @@ def run_filter(type, resolution):
 
     assert len(data) == nb_dalle
 
+
 @pytest.mark.parametrize(
     "resolution",
-    [
-        (10.1),
-        (10.),
-        (9.8)
-    ],
+    [(10.1), (10.0), (9.8)],
 )
 def test_grid_decimation_max(resolution):
     run_filter("max", resolution)
 
+
 @pytest.mark.parametrize(
     "resolution",
-    [
-        (10.3),
-        (10.),
-        (9.9)
-    ],
+    [(10.3), (10.0), (9.9)],
 )
 def test_grid_decimation_min(resolution):
     run_filter("min", resolution)
