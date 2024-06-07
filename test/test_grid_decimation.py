@@ -1,88 +1,30 @@
 import csv
 import json
 import math
-import re
 import tempfile
 from test import utils
+import pytest
 
 import pdal
 import pdaltools.las_info as li
 
+def contains(bounds, x, y):
+    #to be coherent with the grid decimation algorithm
+    return bounds[0] <= x and x < bounds[1] and bounds[2] <= y and y < bounds[3]
 
-def parse_geometry(geometry):
-    regex = r"[0-9-\.]+"
-    parsed_geom = re.findall(regex, geometry)
-    parsed_geom = [float(i) for i in parsed_geom]
-    return (
-        max(parsed_geom[::2]),
-        min(parsed_geom[::2]),
-        max(parsed_geom[1::2]),
-        min(parsed_geom[1::2]),
-    )
-
-
-def read_las_crop(las, line, type):
-
-    tmp_out_las = tempfile.NamedTemporaryFile(suffix=".las").name
-
-    PIPELINE = [
-        {"type": "readers.las", "filename": las, "extra_dims": "grid=uint8"},
-        {
-            "type": "filters.crop",
-            "polygon": line,
-        },
-        {
-            "type": "writers.las",
-            "extra_dims": "all",
-            "filename": tmp_out_las,
-        },
-    ]
-
-    pipeline = pdal.Pipeline(json.dumps(PIPELINE))
-
-    # execute the pipeline
-    pipeline.execute()
-    arrays = pipeline.arrays
-    array = arrays[0]
-
-    max_x, min_x, max_y, min_y = parse_geometry(line)
-
-    ZGrid = 0
-    if type == "max":
-        Z = -9999
-    else:
-        Z = 9999
-    for pt in array:
-        if type == "max" and pt["Z"] > Z:
-            Z = pt["Z"]
-        if type == "min" and pt["Z"] < Z:
-            Z = pt["Z"]
-        if pt["grid"] > 0:
-            # if the point is exactly on the bbox at xmax or ymax, it's one of another cell
-            if pt["X"] == max_x:
-                continue
-            if pt["Y"] == max_y:
-                continue
-            ZGrid = pt["Z"]
-
-    assert ZGrid == Z
-
-
-def run_filter(type):
+def run_filter(type, resolution):
 
     ini_las = "test/data/4_6.las"
-    resolution = 10
 
-    tmp_out_las = tempfile.NamedTemporaryFile(suffix=".las").name
-    tmp_out_wkt = tempfile.NamedTemporaryFile(suffix=".wkt").name
+    tmp_out_wkt = tempfile.NamedTemporaryFile(suffix=f"_{resolution}.wkt").name
 
     filter = "filters.grid_decimation_deprecated"
     utils.pdal_has_plugin(filter)
 
     bounds = li.las_get_xy_bounds(ini_las)
 
-    d_width = math.ceil((bounds[0][1] - bounds[0][0]) / resolution)
-    d_height = math.ceil((bounds[1][1] - bounds[1][0]) / resolution)
+    d_width = math.floor((bounds[0][1] - bounds[0][0]) / resolution) + 1
+    d_height = math.floor((bounds[1][1] - bounds[1][0]) / resolution) + 1
     nb_dalle = d_width * d_height
 
     PIPELINE = [
@@ -93,11 +35,6 @@ def run_filter(type):
             "output_type": type,
             "output_dimension": "grid",
             "output_wkt": tmp_out_wkt,
-        },
-        {
-            "type": "writers.las",
-            "extra_dims": "all",
-            "filename": tmp_out_las,
         },
     ]
 
@@ -115,19 +52,63 @@ def run_filter(type):
 
     assert nb_pts_grid == nb_dalle
 
+    for l in range(d_height):
+        for c in range(d_width):
+
+            cell = [bounds[0][0] + c*resolution, bounds[0][0] + (c+1)*resolution,
+                      bounds[1][0] + l*resolution, bounds[1][0] + (l+1)*resolution]
+
+            nbThreadPtsCrop = 0
+            ZRef = 0
+            ZRefGrid = 0
+
+            for pt in array:
+                x = pt["X"]
+                y = pt["Y"]
+                if not contains(cell, x, y):
+                    continue
+
+                z = pt["Z"]
+                if type == "max":
+                    if ZRef == 0 or z > ZRef:
+                        ZRef = z
+                elif type == "min":
+                    if ZRef == 0 or z < ZRef:
+                        ZRef = z
+
+                if pt["grid"] > 0:
+                    nbThreadPtsCrop += 1
+                    ZRefGrid=z
+
+            assert(nbThreadPtsCrop == 1)
+            assert(ZRef == ZRefGrid)
+
     data = []
     with open(tmp_out_wkt, "r") as f:
         reader = csv.reader(f, delimiter="\t")
         for i, line in enumerate(reader):
             data.append(line[0])
-            read_las_crop(tmp_out_las, line[0], type)
 
     assert len(data) == nb_dalle
 
+@pytest.mark.parametrize(
+    "resolution",
+    [
+        (10.1),
+        (10.),
+        (9.8)
+    ],
+)
+def test_grid_decimation_max(resolution):
+    run_filter("max", resolution)
 
-def test_grid_decimation_max():
-    run_filter("max")
-
-
-def test_grid_decimation_min():
-    run_filter("min")
+@pytest.mark.parametrize(
+    "resolution",
+    [
+        (10.3),
+        (10.),
+        (9.9)
+    ],
+)
+def test_grid_decimation_min(resolution):
+    run_filter("min", resolution)
