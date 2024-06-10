@@ -6,15 +6,19 @@ from test import utils
 
 import pdal
 import pdaltools.las_info as li
+import pytest
 
 
-def run_filter(type):
+def contains(bounds, x, y):
+    # to be coherent with the grid decimation algorithm
+    return bounds[0] <= x and x < bounds[1] and bounds[2] <= y and y < bounds[3]
+
+
+def run_filter(type, resolution):
 
     ini_las = "test/data/4_6.las"
-    resolution = 10
 
-    tmp_out_las = tempfile.NamedTemporaryFile(suffix=".las").name
-    tmp_out_wkt = tempfile.NamedTemporaryFile(suffix=".wkt").name
+    tmp_out_wkt = tempfile.NamedTemporaryFile(suffix=f"_{resolution}.wkt").name
 
     filter = "filters.grid_decimation_deprecated"
     utils.pdal_has_plugin(filter)
@@ -34,12 +38,6 @@ def run_filter(type):
             "output_dimension": "grid",
             "output_wkt": tmp_out_wkt,
         },
-        {
-            "type": "writers.las",
-            "extra_dims": "all",
-            "filename": tmp_out_las,
-            "where": "grid==1",
-        },
     ]
 
     pipeline = pdal.Pipeline(json.dumps(PIPELINE))
@@ -54,9 +52,42 @@ def run_filter(type):
         if pt["grid"] > 0:
             nb_pts_grid += 1
 
-    # fix dans une autre branche en cours
-    # assert nb_pts_grid == 3231
-    assert nb_pts_grid <= nb_dalle
+    assert nb_pts_grid == nb_dalle
+
+    for lig in range(d_height):
+        for col in range(d_width):
+
+            cell = [
+                bounds[0][0] + col * resolution,
+                bounds[0][0] + (col + 1) * resolution,
+                bounds[1][0] + lig * resolution,
+                bounds[1][0] + (lig + 1) * resolution,
+            ]
+
+            nbThreadPtsCrop = 0
+            ZRef = 0
+            ZRefGrid = 0
+
+            for pt in array:
+                x = pt["X"]
+                y = pt["Y"]
+                if not contains(cell, x, y):
+                    continue
+
+                z = pt["Z"]
+                if type == "max":
+                    if ZRef == 0 or z > ZRef:
+                        ZRef = z
+                elif type == "min":
+                    if ZRef == 0 or z < ZRef:
+                        ZRef = z
+
+                if pt["grid"] > 0:
+                    nbThreadPtsCrop += 1
+                    ZRefGrid = z
+
+            assert nbThreadPtsCrop == 1
+            assert ZRef == ZRefGrid
 
     data = []
     with open(tmp_out_wkt, "r") as f:
@@ -64,16 +95,20 @@ def run_filter(type):
         for i, line in enumerate(reader):
             data.append(line[0])
 
-    # fix dans une autre branche en cours
-    # assert len(data) == nb_dalle
-
-    return nb_pts_grid
+    assert len(data) == nb_dalle
 
 
-def test_grid_decimation_max():
-    run_filter("max")
+@pytest.mark.parametrize(
+    "resolution",
+    [(10.1), (10.0), (9.8)],
+)
+def test_grid_decimation_max(resolution):
+    run_filter("max", resolution)
 
 
-# fix dans une autre branche en cours
-# def test_grid_decimation_min():
-#    run_filter("min")
+@pytest.mark.parametrize(
+    "resolution",
+    [(10.3), (10.0), (9.9)],
+)
+def test_grid_decimation_min(resolution):
+    run_filter("min", resolution)
