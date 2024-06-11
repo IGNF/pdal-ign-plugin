@@ -5,14 +5,37 @@ Some useful filters combinations for complete pdal pipeline
 """
 
 
-def add_radius_assign(pipeline, radius, search_3d, condition_src, condition_ref, condition_out):
+def add_radius_assign(
+    pipeline: pdal.Pipeline,
+    radius: float,
+    search_3d: bool,
+    condition_src: str,
+    condition_ref: str,
+    condition_out: str,
+    max2d_above: float = -1,
+    max2d_below: float = -1,
+) -> pdal.Pipeline:
     """
-    search points from "condition_src" closed from "condition_ref", and reassign them to "condition_out"
+    Search points from "condition_src" that are closer than "radius_search" from points that
+    belong to "condition_ref" and modify them with "condition_out"
+
     This combination is equivalent to the CloseBy macro of TerraScan
-    radius : the search distance
-    search_3d : the distance research is in 3d if True
-    condition_src, condition_ref, condition_out : a pdal condition as "Classification==2"
+
+    Args:
+        pipeline (pdal.Pipeline): pdal pipeline
+        radius (float): search distance
+        search_3d (bool): the distance research is in 3d if True (2d otherwise)
+        condition_src (str): pdal condition for points to apply the modification to (eg. "Classification==2")
+        condition_ref (str): pdal condition for the potential neighbors to search for (eg. "Classification==4")
+        condition_out (str): pdal condition to apply to the points that belong to "condition_src" and
+            have a point from "condition_ref" closer than "radius" (eg. "Classification==2")
+        max2d_above (float, optional): In case of 2d Search, upward limit for potential neighbors. Defaults to -1.
+        max2d_below (float, optional):  In case of 2d Search, downward limit for potential neighbors. Defaults to -1.
+
+    Returns:
+        pdal.Pipeline: output pipeline with the radius_assign steps added.
     """
+
     pipeline |= pdal.Filter.ferry(dimensions="=>REF_DOMAIN, =>SRC_DOMAIN, =>radius_search")
     pipeline |= pdal.Filter.assign(
         value=[
@@ -29,6 +52,8 @@ def add_radius_assign(pipeline, radius, search_3d, condition_src, condition_ref,
         reference_domain="REF_DOMAIN",
         output_dimension="radius_search",
         is3d=search_3d,
+        max2d_above=max2d_above,
+        max2d_below=max2d_below,
     )
     pipeline |= pdal.Filter.assign(value=condition_out, where="radius_search==1")
     return pipeline

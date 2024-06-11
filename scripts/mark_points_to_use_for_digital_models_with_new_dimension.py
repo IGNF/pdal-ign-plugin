@@ -140,9 +140,6 @@ def main(input_las, output_las, dsm_dimension, dtm_dimension, output_dsm, output
 
     # 3 - gestion des ponts
     #     bouche trou : on filtre les points (2,3,4,5,9) au milieu du pont en les mettant à PT_ON_BRIDGE=1
-    # TODO: ajouter "demi-cylindre" :
-    # - si végétation au dessus du pont alors on choisit la végétation
-    # - si végétation en dessous du pont alors on choisit le pont
 
     pipeline = macro.add_radius_assign(
         pipeline,
@@ -151,6 +148,8 @@ def main(input_las, output_las, dsm_dimension, dtm_dimension, output_dsm, output
         condition_src=macro.build_condition("Classification", [2, 3, 4, 5, 9]),
         condition_ref="Classification==17",
         condition_out="PT_ON_BRIDGE=1",
+        max2d_above=0,  # ne pas prendre les points qui sont au dessus des points pont (condition_ref)
+        max2d_below=-1,  # prendre tous les points qui sont en dessous des points pont (condition_ref)
     )
     pipeline = macro.add_radius_assign(
         pipeline,
