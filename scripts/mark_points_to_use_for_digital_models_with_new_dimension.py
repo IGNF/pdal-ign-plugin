@@ -87,21 +87,41 @@ def main(input_las, output_las, dsm_dimension, dtm_dimension, output_dsm, output
     )
 
     # max des points de veget (PT_VEG_DSM==1) sur une grille régulière :
-    pipeline |= pdal.Filter.gridDecimation(
-        resolution=0.75, value=f"{dsm_dimension}=1", output_type="max", where="PT_VEG_DSM==1"
+    # TODO: remplacer par GridDecimation une fois le correctif mergé dans PDAL
+    # pipeline |= pdal.Filter.GridDecimation(
+    #     resolution=0.75, value=f"{dsm_dimension}=1", output_type="max", where="PT_VEG_DSM==1"
+    # )
+    pipeline |= pdal.Filter.grid_decimation_deprecated(
+        resolution=0.75, output_dimension=dsm_dimension, output_type="max", where="PT_VEG_DSM==1"
     )
 
     # 2 - sélection des points pour DTM et DSM
 
     # selection de points DTM (max) sur une grille régulière
-    pipeline |= pdal.Filter.gridDecimation(
-        resolution=0.5, value=f"{dtm_dimension}=1", output_type="max", where="Classification==2"
+    # TODO: remplacer par GridDecimation une fois le correctif mergé dans PDAL
+    # pipeline |= pdal.Filter.GridDecimation(
+    #     resolution=0.5, value=f"{dtm_dimension}=1", output_type="max", where="Classification==2"
+    # )
+    pipeline |= pdal.Filter.grid_decimation_deprecated(
+        resolution=0.5,
+        output_dimension=dtm_dimension,
+        output_type="max",
+        where="Classification==2",
     )
 
     # selection de points DSM (max) sur une grille régulière
-    pipeline |= pdal.Filter.gridDecimation(
+    # TODO: remplacer par GridDecimation une fois le correctif mergé dans PDAL
+    # pipeline |= pdal.Filter.GridDecimation(
+    #     resolution=0.5,
+    #     value=f"{dsm_dimension}=1",
+    #     output_type="max",
+    #     where="("
+    #     + macro.build_condition("Classification", [6, 9, 17, 64])
+    #     + f") || {dsm_dimension}==1",
+    # )
+    pipeline |= pdal.Filter.grid_decimation_deprecated(
         resolution=0.5,
-        value=f"{dsm_dimension}=1",
+        output_dimension=dsm_dimension,
         output_type="max",
         where="("
         + macro.build_condition("Classification", [6, 9, 17, 64])
