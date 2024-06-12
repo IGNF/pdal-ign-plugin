@@ -1,3 +1,7 @@
+### 0.1.1 
+
+Fix arguments that are passed from argparse to the main function
+
 ## 0.1.0
 
 Contains 2 pdal filters:

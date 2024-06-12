@@ -192,4 +192,4 @@ def main(input_las, output_las, dsm_dimension, dtm_dimension, output_dsm, output
 
 if __name__ == "__main__":
     args = parse_args()
-    main(**args)
+    main(**vars(args))
