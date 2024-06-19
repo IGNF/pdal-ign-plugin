@@ -5,3 +5,4 @@ install
 */__pycache__
 test/__pycache_
 test/.idea
+*.egg-info
