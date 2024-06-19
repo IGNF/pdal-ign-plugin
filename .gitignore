@@ -2,7 +2,9 @@ xcode
 .vscode
 build
 install
-*/__pycache__
-test/__pycache_
+
+# all pycache directories
+__pycache__
+
 test/.idea
 *.egg-info
