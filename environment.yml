@@ -13,6 +13,8 @@ dependencies:
   - isort # import sorting
   - flake8 # code analysis
   - pytest
+  - build
+  - twine
 # --------- pip & pip libraries --------- #
   - pip
   - pip:

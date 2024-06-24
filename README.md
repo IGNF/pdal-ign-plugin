@@ -107,7 +107,7 @@ docker image.
 ### Syntax to use it in a python script
 
 ```python
-from macro import macro
+from pdal_ign_macro import macro
 
 marco.my_macro(...)
 ```

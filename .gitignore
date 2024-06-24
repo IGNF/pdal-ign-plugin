@@ -2,6 +2,7 @@ xcode
 .vscode
 build
 install
+dist
 
 # all pycache directories
 __pycache__

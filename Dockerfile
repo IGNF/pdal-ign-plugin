@@ -23,11 +23,10 @@ ENV PROJ_LIB=/opt/conda/envs/pdal_ign_plugin/share/proj/
 ENV PDAL_DRIVER_PATH=/pdal_ign_plugin/install/lib
 
 # Install python macro module
-COPY macro /pdal_ign_plugin/macro
+COPY pdal_ign_macro /pdal_ign_plugin/pdal_ign_macro
 COPY pyproject.toml /pdal_ign_plugin/pyproject.toml
 WORKDIR /pdal_ign_plugin
 RUN pip install .
 
 # Add example scripts + test data (to be able to test inside the docker image)
-COPY scripts /pdal_ign_plugin/scripts
 COPY test /pdal_ign_plugin/test
