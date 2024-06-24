@@ -1,13 +1,19 @@
 [project]
 name = "pdal_ign_macro"
 dynamic = ["version"]
+readme = "README.md"
+description = "Macros and pipelines for Pdal based on the https://github.com/IGNF/pdal-ign-plugin plugin"
 dependencies = []
+authors = [
+  { name = "Antoine Lavenant", email = "antoine.lavenant@ign.fr" },
+  { name = "Léa Vauchier", email = "lea.vauchier@ign.fr" },
+]
 
 [tool.setuptools.dynamic]
-version = { attr = "macro.version.__version__" }
+version = { attr = "pdal_ign_macro.version.__version__" }
 
 [tool.setuptools]
-packages = ["macro"]
+packages = ["pdal_ign_macro"]
 
 [tool.black]
 line-length = 99

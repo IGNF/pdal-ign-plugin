@@ -2,7 +2,7 @@ import argparse
 
 import pdal
 
-from macro import macro
+from pdal_ign_macro import macro
 
 """
 This tool shows how to use functions of macro in a pdal pipeline

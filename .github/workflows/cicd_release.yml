@@ -6,13 +6,48 @@ on:
       - "v*.*.*"
 
 jobs:
-  build:
+  release-github:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Release
+      - name: Release on github
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
           make_latest: true
+
+  deploy-pypi:
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/pdal-ign-macro/
+    permissions:
+      contents: read
+      packages: write
+      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      # See https://github.com/marketplace/actions/setup-micromamba
+      - name: setup-micromamba
+        uses: mamba-org/setup-micromamba@v1.9.0
+        with:
+          environment-file: environment.yml
+          environment-name: pdal_ign_plugin  # activate the environment
+          cache-environment: true
+          cache-downloads: true
+          generate-run-shell: true
+
+      - name: Build pip package
+        shell: micromamba-shell {0}
+        run: |
+          rm -rf tmp
+          rm -rf pdal_ign_macro.egg-info
+          rm -rf dist
+          python -m build
+
+      - name: pypi-publish
+        uses: pypa/gh-action-pypi-publish@v1.9.0

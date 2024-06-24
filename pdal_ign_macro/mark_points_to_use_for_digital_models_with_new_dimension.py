@@ -2,7 +2,7 @@ import argparse
 
 import pdal
 
-from macro import macro
+from pdal_ign_macro import macro
 
 """
 This tool applies a pdal pipeline to select points for DSM and DTM calculation
@@ -42,7 +42,9 @@ def parse_args():
     return parser.parse_args()
 
 
-def main(input_las, output_las, dsm_dimension, dtm_dimension, output_dsm, output_dtm):
+def mark_points_to_use_for_digital_models_with_new_dimension(
+    input_las, output_las, dsm_dimension, dtm_dimension, output_dsm, output_dtm
+):
     pipeline = pdal.Pipeline() | pdal.Reader.las(input_las)
 
     # 0 - ajout de dimensions temporaires et de sortie
@@ -192,4 +194,4 @@ def main(input_las, output_las, dsm_dimension, dtm_dimension, output_dsm, output
 
 if __name__ == "__main__":
     args = parse_args()
-    main(**vars(args))
+    mark_points_to_use_for_digital_models_with_new_dimension(**vars(args))
