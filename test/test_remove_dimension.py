@@ -2,7 +2,7 @@ import tempfile
 import pdal
 import numpy
 
-from macro.macro import remove_dimensions
+from pdal_ign_macro.macro import remove_dimensions
 
 
 def test_remove_dimension():
