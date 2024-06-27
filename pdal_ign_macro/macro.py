@@ -1,4 +1,8 @@
 import pdal
+import numpy
+import json
+
+import pdaltools.las_info as li
 
 """
 Some useful filters combinations for complete pdal pipeline
@@ -81,6 +85,40 @@ def keep_non_planar_pts(pipeline, condition, condition_out):
     pipeline |= pdal.Filter.approximatecoplanar(knn=8, thresh1=25, thresh2=6, where=condition)
     pipeline |= pdal.Filter.assign(value=condition_out, where=f"Coplanar==0 && ({condition})")
     return pipeline
+
+
+def remove_dimensions(input_las, dimensions, ouput_las):
+    """
+    export new las whitout some dimensions
+    """
+    pipeline = pdal.Pipeline() | pdal.Reader.las(input_las)
+    pipeline.execute()
+    points = pipeline.arrays[0]
+
+    dim_remove = []
+    for dim in dimensions:
+        dim_remove.append(list(points.dtype.fields.keys()).index(dim))
+
+    new_points = []
+    for pt in points:
+        ptl = list(pt)
+        ptl = [ptl[i] for i in range(len(ptl)) if i not in dim_remove]
+        new_points.append(tuple(ptl))
+
+    new_dtype = {}
+    for dim in points.dtype.fields.keys():
+        if dim in dimensions:
+            continue
+        new_dtype[dim] = points.dtype.fields[dim]
+
+    new_las = numpy.array(new_points, dtype=new_dtype)
+    params = li.get_writer_parameters_from_reader_metadata(pipeline.metadata)
+
+    pipeline_end = pdal.Pipeline(arrays=[new_las], )
+    pipeline_end |= pdal.Writer.las(ouput_las, forward="all", **params )
+
+    pipeline_end.execute()
+
 
 
 def build_condition(key, values):
