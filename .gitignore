@@ -9,4 +9,4 @@ __pycache__
 
 test/.idea
 *.egg-info
-.idea
+*.idea
