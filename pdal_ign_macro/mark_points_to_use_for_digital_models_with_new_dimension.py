@@ -165,7 +165,7 @@ def mark_points_to_use_for_digital_models_with_new_dimension(
         where="(PT_ON_VEGET==0 && ("
         + macro.build_condition("Classification", [6, 9, 17, 64])
         + f") || {dsm_dimension}==1)",
-    )  #
+    )
 
     # assigne des points sol sélectionnés : les points proches de la végétation, des ponts, de l'eau, 64
     pipeline = macro.add_radius_assign(
