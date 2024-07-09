@@ -48,7 +48,14 @@ def mark_points_to_use_for_digital_models_with_new_dimension(
     pipeline = pdal.Pipeline() | pdal.Reader.las(input_las)
 
     # 0 - ajout de dimensions temporaires et de sortie
-    added_dimensions = [dtm_dimension, dsm_dimension, "PT_VEG_DSM", "PT_ON_BRIDGE"]
+    added_dimensions = [
+        dtm_dimension,
+        dsm_dimension,
+        "PT_VEG_DSM",
+        "PT_ON_BRIDGE",
+        "PT_ON_BUILDING",
+        "PT_ON_VEGET",
+    ]
     pipeline |= pdal.Filter.ferry(dimensions="=>" + ", =>".join(added_dimensions))
 
     # 1 - recherche des points max de végétation (4,5) sur une grille régulière, avec prise en
@@ -73,9 +80,39 @@ def mark_points_to_use_for_digital_models_with_new_dimension(
         pipeline,
         1,
         False,
+        condition_src=macro.build_condition("Classification", [6, 17]),
+        condition_ref=macro.build_condition("Classification", [4, 5]),
+        condition_out="PT_ON_VEGET=1",
+        max2d_above=0,  # ne pas prendre les points qui sont au dessus des points pont (condition_ref)
+        max2d_below=900,  # prendre tous les points qui sont en dessous des points pont (condition_ref)
+    )
+    pipeline = macro.add_radius_assign(
+        pipeline,
+        1,
+        False,
         condition_src="PT_VEG_DSM==1 && Classification==2",
-        condition_ref="Classification==2",
+        condition_ref="Classification==2 && PT_VEG_DSM==0",
         condition_out="PT_VEG_DSM=0",
+    )
+    pipeline = macro.add_radius_assign(
+        pipeline,
+        1,
+        False,
+        condition_src="PT_ON_VEGET==1 && Classification==6",
+        condition_ref="Classification==6 && PT_ON_VEGET==0",
+        condition_out="PT_ON_VEGET=0",
+        max2d_above=0.5,  # ne pas  prendre les points qui sont au dessus des points pont (condition_ref)
+        max2d_below=0.5,  # prendre tous les points qui sont en dessous des points pont (condition_ref)
+    )
+    pipeline = macro.add_radius_assign(
+        pipeline,
+        1,
+        False,
+        condition_src="PT_ON_VEGET==1 && Classification==17",
+        condition_ref="Classification==17 && PT_ON_VEGET==0",
+        condition_out="PT_ON_VEGET=0",
+        max2d_above=0.5,  # ne pas  prendre les points qui sont au dessus des points pont (condition_ref)
+        max2d_below=0.5,  # prendre tous les points qui sont en dessous des points pont (condition_ref)
     )
 
     # selection des points de veget basse proche de la veget haute
@@ -90,9 +127,6 @@ def mark_points_to_use_for_digital_models_with_new_dimension(
 
     # max des points de veget (PT_VEG_DSM==1) sur une grille régulière :
     # TODO: remplacer par GridDecimation une fois le correctif mergé dans PDAL
-    # pipeline |= pdal.Filter.GridDecimation(
-    #     resolution=0.75, value=f"{dsm_dimension}=1", output_type="max", where="PT_VEG_DSM==1"
-    # )
     pipeline |= pdal.Filter.grid_decimation_deprecated(
         resolution=0.75, output_dimension=dsm_dimension, output_type="max", where="PT_VEG_DSM==1"
     )
@@ -101,9 +135,6 @@ def mark_points_to_use_for_digital_models_with_new_dimension(
 
     # selection de points DTM (max) sur une grille régulière
     # TODO: remplacer par GridDecimation une fois le correctif mergé dans PDAL
-    # pipeline |= pdal.Filter.GridDecimation(
-    #     resolution=0.5, value=f"{dtm_dimension}=1", output_type="max", where="Classification==2"
-    # )
     pipeline |= pdal.Filter.grid_decimation_deprecated(
         resolution=0.5,
         output_dimension=dtm_dimension,
@@ -113,21 +144,13 @@ def mark_points_to_use_for_digital_models_with_new_dimension(
 
     # selection de points DSM (max) sur une grille régulière
     # TODO: remplacer par GridDecimation une fois le correctif mergé dans PDAL
-    # pipeline |= pdal.Filter.GridDecimation(
-    #     resolution=0.5,
-    #     value=f"{dsm_dimension}=1",
-    #     output_type="max",
-    #     where="("
-    #     + macro.build_condition("Classification", [6, 9, 17, 64])
-    #     + f") || {dsm_dimension}==1",
-    # )
     pipeline |= pdal.Filter.grid_decimation_deprecated(
         resolution=0.5,
         output_dimension=dsm_dimension,
         output_type="max",
-        where="("
+        where="(PT_ON_VEGET==0 && ("
         + macro.build_condition("Classification", [6, 9, 17, 64])
-        + f") || {dsm_dimension}==1",
+        + f") || {dsm_dimension}==1)",
     )
 
     # assigne des points sol sélectionnés : les points proches de la végétation, des ponts, de l'eau, 64
@@ -137,35 +160,65 @@ def mark_points_to_use_for_digital_models_with_new_dimension(
         False,
         condition_src=f"{dtm_dimension}==1",
         condition_ref=macro.build_condition("Classification", [4, 5, 6, 9, 17, 64]),
+        condition_out=f"{dsm_dimension}=0",
+    )
+    # Test proximité batiment
+    pipeline = macro.add_radius_assign(
+        pipeline,
+        1.25,
+        False,
+        condition_src="Classification==2 && PT_VEG_DSM==0",
+        condition_ref="Classification==6",
+        condition_out="PT_ON_BUILDING=1",
+    )
+    # BUFFER INVERSE Se mettre
+    pipeline = macro.add_radius_assign(
+        pipeline,
+        1,
+        False,
+        condition_src=f"Classification==2 && {dsm_dimension}==0 && PT_ON_BUILDING==1 && {dtm_dimension}==1",
+        condition_ref="Classification==2 && PT_ON_BUILDING==0 && PT_VEG_DSM==0",
         condition_out=f"{dsm_dimension}=1",
     )
-
     # 3 - gestion des ponts
     #     bouche trou : on filtre les points (2,3,4,5,9) au milieu du pont en les mettant à PT_ON_BRIDGE=1
-
     pipeline = macro.add_radius_assign(
         pipeline,
         1.5,
         False,
-        condition_src=macro.build_condition("Classification", [2, 3, 4, 5, 9]),
+        condition_src=macro.build_condition("Classification", [2, 3, 4, 5, 6, 9]),
         condition_ref="Classification==17",
         condition_out="PT_ON_BRIDGE=1",
-        max2d_above=0,  # ne pas prendre les points qui sont au dessus des points pont (condition_ref)
-        max2d_below=-1,  # prendre tous les points qui sont en dessous des points pont (condition_ref)
+        max2d_above=0,  # ne pas  prendre les points qui sont au dessus des points pont (condition_ref)
+        max2d_below=900,  # prendre tous les points qui sont en dessous des points pont (condition_ref)
     )
     pipeline = macro.add_radius_assign(
         pipeline,
-        1.5,
+        1.25,
         False,
+        # condition_ref=macro.build_condition("Classification", [2, 3, 4, 5]),
         condition_src="PT_ON_BRIDGE==1",
-        condition_ref=macro.build_condition("Classification", [2, 3, 4, 5]),
+        condition_ref="PT_ON_BRIDGE==0 && ( "
+        + macro.build_condition("Classification", [2, 3, 4, 5, 6, 9])
+        + " )",
         condition_out="PT_ON_BRIDGE=0",
+        max2d_above=0.5,  # ne pas  prendre les points qui sont au dessus des points pont (condition_ref)
+        max2d_below=0.5,  # prendre tous les points qui sont en dessous des points pont (condition_ref)
     )
-    pipeline |= pdal.Filter.assign(value=[f"{dsm_dimension}=0 WHERE PT_ON_BRIDGE==1"])
+    # pipeline |= pdal.Filter.assign(value=[f"{dsm_dimension}=0 WHERE (PT_ON_BRIDGE==1 && NOT(Classification==17))"])
+    pipeline |= pdal.Filter.assign(
+        value=[f"{dsm_dimension}=0 WHERE PT_ON_BRIDGE==1"]
+        # value=["dsm_marker=0 WHERE (PT_ON_BRIDGE==1 AND ( " + macro.build_condition("Classification", [2,3,4,5,6,9]) + " ))"]
+    )
 
     # 4 - point pour DTM servent au DSM également
-    pipeline |= pdal.Filter.assign(value=[f"{dsm_dimension}=1 WHERE {dtm_dimension}==1"])
-
+    # HOMOGENEISER L UTILISATION DE PT_VEG_DSM POUR LES POINT SOL SOUS VEGET AVEC PT_ON_VEGET
+    pipeline |= pdal.Filter.assign(
+        value=[
+            f"{dsm_dimension}=1 WHERE ({dtm_dimension}==1 && PT_VEG_DSM==0 && PT_ON_BRIDGE==0 && PT_ON_BUILDING==0 )"
+        ]
+    )
+    # ERREUR EN 4!###############################################################################################!
     # 5 - export du nuage et des DSM
     # TODO: n'ajouter que les dimensions de sortie utiles !
 
@@ -175,7 +228,7 @@ def mark_points_to_use_for_digital_models_with_new_dimension(
         pipeline |= pdal.Writer.gdal(
             gdaldriver="GTiff",
             output_type="max",
-            resolution=2.0,
+            resolution=0.5,
             filename=output_dtm,
             where=f"{dtm_dimension}==1",
         )
@@ -184,7 +237,7 @@ def mark_points_to_use_for_digital_models_with_new_dimension(
         pipeline |= pdal.Writer.gdal(
             gdaldriver="GTiff",
             output_type="max",
-            resolution=2.0,
+            resolution=0.5,
             filename=output_dsm,
             where=f"{dsm_dimension}==1",
         )
