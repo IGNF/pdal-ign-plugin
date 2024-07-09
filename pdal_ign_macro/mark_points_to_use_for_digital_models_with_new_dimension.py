@@ -127,9 +127,6 @@ def mark_points_to_use_for_digital_models_with_new_dimension(
 
     # max des points de veget (PT_VEG_DSM==1) sur une grille régulière :
     # TODO: remplacer par GridDecimation une fois le correctif mergé dans PDAL
-    # pipeline |= pdal.Filter.GridDecimation(
-    #     resolution=0.75, value=f"{dsm_dimension}=1", output_type="max", where="PT_VEG_DSM==1"
-    # )
     pipeline |= pdal.Filter.grid_decimation_deprecated(
         resolution=0.75, output_dimension=dsm_dimension, output_type="max", where="PT_VEG_DSM==1"
     )
@@ -138,9 +135,6 @@ def mark_points_to_use_for_digital_models_with_new_dimension(
 
     # selection de points DTM (max) sur une grille régulière
     # TODO: remplacer par GridDecimation une fois le correctif mergé dans PDAL
-    # pipeline |= pdal.Filter.GridDecimation(
-    #     resolution=0.5, value=f"{dtm_dimension}=1", output_type="max", where="Classification==2"
-    # )
     pipeline |= pdal.Filter.grid_decimation_deprecated(
         resolution=0.5,
         output_dimension=dtm_dimension,
@@ -150,14 +144,6 @@ def mark_points_to_use_for_digital_models_with_new_dimension(
 
     # selection de points DSM (max) sur une grille régulière
     # TODO: remplacer par GridDecimation une fois le correctif mergé dans PDAL
-    # pipeline |= pdal.Filter.GridDecimation(
-    #     resolution=0.5,
-    #     value=f"{dsm_dimension}=1",
-    #     output_type="max",
-    #     where="("
-    #     + macro.build_condition("Classification", [6, 9, 17, 64])
-    #     + f") || {dsm_dimension}==1",
-    # )
     pipeline |= pdal.Filter.grid_decimation_deprecated(
         resolution=0.5,
         output_dimension=dsm_dimension,
