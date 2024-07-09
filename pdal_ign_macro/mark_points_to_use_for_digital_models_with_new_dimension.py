@@ -226,7 +226,7 @@ def mark_points_to_use_for_digital_models_with_new_dimension(
     )
 
     # 4 - point pour DTM servent au DSM également
-    # HOMOGENEISER L UTILISATION DE PTVEGDSM POUR LES POINT SOL SOUS VEGET AVEC PT_ON_VEGET
+    # HOMOGENEISER L UTILISATION DE PT_VEG_DSM POUR LES POINT SOL SOUS VEGET AVEC PT_ON_VEGET
     pipeline |= pdal.Filter.assign(
         value=[
             f"{dsm_dimension}=1 WHERE ({dtm_dimension}==1 && PT_VEG_DSM==0 && PT_ON_BRIDGE==0 && PT_ON_BUILDING==0 )"
