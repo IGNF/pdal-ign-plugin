@@ -4,7 +4,8 @@ on:
   # Run tests for non-draft pull request on main
   pull_request:
     branches:
-      - main
+      #- main
+      - '**'
 
 env:
   DOCKER_IMAGE_NAME: pdal_ign_plugin
