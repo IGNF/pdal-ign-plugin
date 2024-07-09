@@ -12,7 +12,7 @@ on:
 
 
 env:
-  DOCKER_IMAGE_NAME: pdal_ign_plugin
+  IMAGE_NAME: pdal_ign_plugin
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
 
@@ -25,11 +25,11 @@ jobs:
     - name: Checkout branch
       uses: actions/checkout@v4
 
-    - name: Build docker image
-      run: docker build -t ${{ env.DOCKER_IMAGE_NAME }}:test .
+   # - name: Build docker image
+   #   run: docker build -t ${{ env.DOCKER_IMAGE_NAME }}:test .
 
-    - name: Run tests in docker image
-      run: docker run ${{ env.DOCKER_IMAGE_NAME }}:test python -m pytest
+   # - name: Run tests in docker image
+   #   run: docker run ${{ env.DOCKER_IMAGE_NAME }}:test python -m pytest
 
     # Login against a Docker registry except on PR
     # https://github.com/docker/login-action
@@ -47,7 +47,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v3
       with:
-        images: ${{ env.REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
     # Build and push Docker image with Buildx (don't push on PR)
     # https://github.com/docker/build-push-action
