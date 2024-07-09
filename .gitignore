@@ -7,6 +7,5 @@ dist
 # all pycache directories
 __pycache__
 
-test/.idea
 *.egg-info
 *.idea
