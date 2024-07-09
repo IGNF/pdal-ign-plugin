@@ -87,9 +87,10 @@ def build_condition(key, values):
     """
     build 'key==values[0] || key==values[1] ...'
     """
-    condition = ""
+    condition = "("
     for v in values:
         condition += key + "==" + str(v)
         if v != values[-1]:
             condition += " || "
+    condition += ")"
     return condition
