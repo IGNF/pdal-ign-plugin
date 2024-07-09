@@ -131,7 +131,7 @@ def mark_points_to_use_for_digital_models_with_new_dimension(
         resolution=0.75, output_dimension=dsm_dimension, output_type="max", where="PT_VEG_DSM==1"
     )
 
-    # 2 - sélection des points pour DTM et DSM#
+    # 2 - sélection des points pour DTM et DSM
 
     # selection de points DTM (max) sur une grille régulière
     # TODO: remplacer par GridDecimation une fois le correctif mergé dans PDAL
