@@ -12,7 +12,7 @@ on:
 
 
 env:
-  IMAGE_NAME: pdal_ign_plugin
+  IMAGE_NAME: ${{ github.repository }}
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
 
@@ -26,10 +26,10 @@ jobs:
       uses: actions/checkout@v4
 
    # - name: Build docker image
-   #   run: docker build -t ${{ env.DOCKER_IMAGE_NAME }}:test .
+   #   run: docker build -t ${{ env.IMAGE_NAME }}:test .
 
    # - name: Run tests in docker image
-   #   run: docker run ${{ env.DOCKER_IMAGE_NAME }}:test python -m pytest
+   #   run: docker run ${{ env.IMAGE_NAME }}:test python -m pytest
 
     # Login against a Docker registry except on PR
     # https://github.com/docker/login-action
