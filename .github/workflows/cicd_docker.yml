@@ -23,12 +23,6 @@ jobs:
     - name: Checkout branch
       uses: actions/checkout@v4
 
-    # build and test image docker
-    - name: Build docker image
-      run: docker build -t ${{ env.DOCKER_IMAGE_NAME }}:test 
-    - name: Run tests in docker image
-      run: docker run ${{ env.DOCKER_IMAGE_NAME }}:test python -m pytest
-
     # Login against a Docker registry except on PR
     # https://github.com/docker/login-action
     - name: Log into registry ${{ env.REGISTRY }}
@@ -57,3 +51,11 @@ jobs:
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+
+    # pull and test 
+    - name : Pull Docker image
+      id: pull-image
+      run: docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}
+    - name : Test Docker image
+      id: test-image
+      run: docker run ${{ env.IMAGE_NAME }}:test python -m pytest
