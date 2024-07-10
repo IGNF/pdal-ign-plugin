@@ -2,10 +2,11 @@ name: cicd_docker
 
 on:
   push:
-    tags:
-      - '*'
+    branches: [ "main" ]
+    tags: [ 'v*.*.*' ]
+  pull_request:
+    branches: [ "main" ]
 
-# https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs#defining-access-for-the-github_token-scopes
 permissions:
   packages: write
 
@@ -25,7 +26,7 @@ jobs:
     # Login against a Docker registry except on PR
     # https://github.com/docker/login-action
     - name: Log into registry ${{ env.REGISTRY }}
-      #if: github.event_name != 'pull_request'
+      if: github.event_name != 'pull_request'
       uses: docker/login-action@v2
       with:
         registry: ${{ env.REGISTRY }}
@@ -47,7 +48,6 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         context: .
-        #push: ${{ github.event_name != 'pull_request' }}
-        push: True
+        push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
