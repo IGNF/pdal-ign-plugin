@@ -13,6 +13,7 @@ permissions:
 env:
   IMAGE_NAME: ${{ github.repository }}
   REGISTRY: ghcr.io
+  DOCKER_IMAGE_NAME: pdal_ign_plugin
 
 jobs:
   build_docker_image_and_run_tests:
@@ -55,7 +56,7 @@ jobs:
     # pull and test 
     - name : Pull Docker image
       id: pull-image
-      run: docker pull ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}
+      run: docker pull ${{ env.DOCKER_IMAGE_NAME }}${{ steps.meta.outputs.tags }}
     - name : Test Docker image
       id: test-image
-      run: docker run ${{ env.IMAGE_NAME }}:test python -m pytest
+      run: docker run ${{ env.DOCKER_IMAGE_NAME }}${{ steps.meta.outputs.tags }} python -m pytest
