@@ -23,6 +23,12 @@ jobs:
     - name: Checkout branch
       uses: actions/checkout@v4
 
+    # build and test image docker
+    - name: Build docker image
+      run: docker build -t ${{ env.DOCKER_IMAGE_NAME }}:test 
+    - name: Run tests in docker image
+      run: docker run ${{ env.DOCKER_IMAGE_NAME }}:test python -m pytest
+
     # Login against a Docker registry except on PR
     # https://github.com/docker/login-action
     - name: Log into registry ${{ env.REGISTRY }}
