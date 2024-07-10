@@ -55,7 +55,7 @@ jobs:
     # pull and test 
     - name : Pull Docker image
       id: pull-image
-      run: docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}
+      run: docker pull ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}
     - name : Test Docker image
       id: test-image
       run: docker run ${{ env.IMAGE_NAME }}:test python -m pytest
