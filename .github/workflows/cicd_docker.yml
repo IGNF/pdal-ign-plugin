@@ -56,7 +56,7 @@ jobs:
     # pull and test 
     - name : Pull Docker image
       id: pull-image
-      run: docker pull ghcr.io/ignf/pdal-ign-plugin:${{ steps.meta.outputs.tags }}
+      run: docker pull ${{ steps.meta.outputs.tags }}
     - name : Test Docker image
       id: test-image
-      run: docker run ghcr.io/ignf/pdal-ign-plugin:${{ steps.meta.outputs.tags }} python -m pytest
+      run: docker run ${{ steps.meta.outputs.tags }} python -m pytest
