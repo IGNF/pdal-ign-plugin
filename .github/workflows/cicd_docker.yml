@@ -30,6 +30,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         load: true
+        labels: ${{ env.DOCKER_IMAGE_NAME }}
         tags: test
 
     # run the test on the docker build
