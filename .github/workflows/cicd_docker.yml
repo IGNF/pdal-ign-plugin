@@ -14,6 +14,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
   REGISTRY: ghcr.io
   DOCKER_IMAGE_NAME: pdal_ign_plugin
+  TEST_TAG: ${{ env.DOCKER_IMAGE_NAME }}:test
 
 jobs:
   build_docker_image_and_run_tests:
@@ -30,12 +31,11 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         load: true
-        labels: ${{ env.DOCKER_IMAGE_NAME }}
-        tags: test
+        tags: ${{ env.TEST_TAG }}
 
     # run the test on the docker build
     - name: Run tests in docker image
-      run: docker run ${{ env.DOCKER_IMAGE_NAME }}:test python -m pytest
+      run: docker run ${{ env.TEST_TAG }} python -m pytest
 
     # Login against a Docker registry except on PR
     # https://github.com/docker/login-action
