@@ -24,9 +24,15 @@ jobs:
     - name: Checkout branch
       uses: actions/checkout@v4
 
-    # build "local" and test before build and deploy  
-    - name: Build docker image
-      run: docker build -t ${{ env.DOCKER_IMAGE_NAME }}:test .
+    # build the image
+    - name: Build and push Docker image
+      id: build-and-push
+      uses: docker/build-push-action@v5
+      with:
+        load: true
+        tags: test
+
+    # run the test on the docker build
     - name: Run tests in docker image
       run: docker run ${{ env.DOCKER_IMAGE_NAME }}:test python -m pytest
 
@@ -43,6 +49,7 @@ jobs:
     # Extract metadata (tags, labels) for Docker
     # https://github.com/docker/metadata-action
     - name: Extract Docker metadata
+      if: github.event_name != 'pull_request'
       id: meta
       uses: docker/metadata-action@v5
       with:
@@ -59,13 +66,3 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-
-    # pull and test 
-    - name : Pull Docker image
-      id: pull-image
-      if: github.event_name != 'pull_request'
-      run: docker pull ${{ steps.meta.outputs.tags }}
-    - name : Test Docker image
-      id: test-image
-      if: github.event_name != 'pull_request'
-      run: docker run ${{ steps.meta.outputs.tags }} python -m pytest
