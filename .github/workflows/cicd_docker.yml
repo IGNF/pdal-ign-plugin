@@ -14,7 +14,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}
   REGISTRY: ghcr.io
   DOCKER_IMAGE_NAME: pdal_ign_plugin
-  TEST_TAG: ${{ env.DOCKER_IMAGE_NAME }}:test
+  TEST_TAG: pdal_ign_plugin:test
 
 jobs:
   build_docker_image_and_run_tests:
