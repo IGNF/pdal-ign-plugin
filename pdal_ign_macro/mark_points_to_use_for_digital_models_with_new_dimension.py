@@ -3,6 +3,7 @@ import shutil
 import tempfile
 
 import pdal
+from pdaltools.las_add_buffer import run_on_buffered_las
 from pdaltools.las_remove_dimensions import remove_dimensions_from_las
 
 from pdal_ign_macro import macro
@@ -48,6 +49,39 @@ def parse_args():
         action="store_true",
         help="If set, do not delete temporary dimensions",
     )
+    parser.add_argument(
+        "--skip_buffer",
+        "-s",
+        action="store_true",
+        help="If set, skip adding a buffer from the neighbor tiles based on their name",
+    )
+    parser.add_argument(
+        "--buffer_width",
+        type=float,
+        default=25,
+        help="width of the border to add to the tile (in meters)",
+    )
+    parser.add_argument(
+        "--spatial_ref",
+        type=str,
+        default="EPSG:2154",
+        help="spatial reference for the writer (required when running with a buffer)",
+    )
+    parser.add_argument(
+        "--tile_width",
+        type=int,
+        default=1000,
+        action="store_true",
+        help="width of tiles in meters (required when running with a buffer)",
+    )
+    parser.add_argument(
+        "--tile_coord_scale",
+        type=int,
+        default=1000,
+        action="store_true",
+        help="scale used in the filename to describe coordinates in meters (required when running with a buffer)",
+    )
+
     return parser.parse_args()
 
 
@@ -237,7 +271,7 @@ def mark_points_to_use_for_digital_models_with_new_dimension(
     output_dtm,
     keep_temporary_dimensions=False,
 ):
-    with tempfile.NamedTemporaryFile(suffix="_with_buffer.las", dir=".") as tmp_las:
+    with tempfile.NamedTemporaryFile(suffix="_with_temporary_dims.las", dir=".") as tmp_las:
         pipeline, temporary_dimensions = define_marking_pipeline(
             input_las,
             tmp_las.name,
@@ -268,9 +302,53 @@ def mark_points_to_use_for_digital_models_with_new_dimension(
         if keep_temporary_dimensions:
             shutil.copy(tmp_las.name, output_las)
         else:
-            remove_dimensions_from_las(tmp_las.name, temporary_dimensions, output_las)
+            remove_dimensions_from_las(
+                tmp_las.name,
+                temporary_dimensions + ["SRC_DOMAIN", "REF_DOMAIN", "radius_search"],
+                output_las,
+            )
+
+
+def main(
+    input_las,
+    output_las,
+    dsm_dimension,
+    dtm_dimension,
+    output_dsm,
+    output_dtm,
+    keep_temporary_dimensions=False,
+    skip_buffer=False,
+    buffer_width=25,
+    spatial_ref="EPSG:2154",
+    tile_width=1000,
+    tile_coord_scale=1000,
+):
+    if skip_buffer:
+        mark_points_to_use_for_digital_models_with_new_dimension(
+            input_las,
+            output_las,
+            dsm_dimension,
+            dtm_dimension,
+            output_dsm,
+            output_dtm,
+            keep_temporary_dimensions,
+        )
+    else:
+        mark_with_buffer = run_on_buffered_las(
+            buffer_width, spatial_ref, tile_width, tile_coord_scale
+        )(mark_points_to_use_for_digital_models_with_new_dimension)
+
+        mark_with_buffer(
+            input_las,
+            output_las,
+            dsm_dimension,
+            dtm_dimension,
+            output_dsm,
+            output_dtm,
+            keep_temporary_dimensions,
+        )
 
 
 if __name__ == "__main__":
     args = parse_args()
-    mark_points_to_use_for_digital_models_with_new_dimension(**vars(args))
+    main(**vars(args))
