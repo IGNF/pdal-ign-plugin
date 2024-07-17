@@ -134,8 +134,12 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
         pipeline,
         1,
         False,
-        condition_src="PT_ON_VEGET==1 && ( "+macro.build_condition("Classification", [6, 67]) + " )",
-        condition_ref="PT_ON_VEGET==0 && ( "+macro.build_condition("Classification", [6, 67]) + " )",
+        condition_src="PT_ON_VEGET==1 && ( "
+        + macro.build_condition("Classification", [6, 67])
+        + " )",
+        condition_ref="PT_ON_VEGET==0 && ( "
+        + macro.build_condition("Classification", [6, 67])
+        + " )",
         condition_out="PT_ON_VEGET=0",
         max2d_above=0.5,  # ne pas  prendre les points qui sont au dessus des points pont (condition_ref)
         max2d_below=0.5,  # prendre tous les points qui sont en dessous des points pont (condition_ref)
@@ -209,7 +213,7 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
         resolution=0.5,
         output_dimension=dtm_dimension,
         output_type="max",
-        where="(Classification==2 || PT_ON_SOL==0 && Classification==9)"
+        where="(Classification==2 || PT_ON_SOL==0 && Classification==9)",
     )
 
     # selection de points DSM (max) sur une grille régulière
@@ -274,9 +278,7 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
         max2d_above=0.5,  # ne pas  prendre les points qui sont au dessus des points pont (condition_ref)
         max2d_below=0.5,  # prendre tous les points qui sont en dessous des points pont (condition_ref)
     )
-    pipeline |= pdal.Filter.assign(
-        value=[f"{dsm_dimension}=0 WHERE PT_ON_BRIDGE==1"]
-    )
+    pipeline |= pdal.Filter.assign(value=[f"{dsm_dimension}=0 WHERE PT_ON_BRIDGE==1"])
 
     # 4 - point pour DTM servent au DSM également
     # HOMOGENEISER L UTILISATION DE PT_VEG_DSM POUR LES POINT SOL SOUS VEGET AVEC PT_ON_VEGET
@@ -287,9 +289,7 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
     )
 
     # 5 - Ajout de la classe 66 pts virtuels dans DTM et DSM
-    pipeline |= pdal.Filter.assign(
-        value=[f"{dtm_dimension}=1 WHERE (Classification==66)"]
-    )
+    pipeline |= pdal.Filter.assign(value=[f"{dtm_dimension}=1 WHERE (Classification==66)"])
 
     # 6 - export du nuage et des DSM
     pipeline |= pdal.Writer.las(extra_dims="all", forward="all", filename=output_las)
