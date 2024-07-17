@@ -1,6 +1,9 @@
 import argparse
+import shutil
+import tempfile
 
 import pdal
+from pdaltools.las_remove_dimensions import remove_dimensions_from_las
 
 from pdal_ign_macro import macro
 
@@ -39,23 +42,22 @@ def parse_args():
     parser.add_argument(
         "--output_dtm", "-t", type=str, required=False, default="", help="Output dtm tiff file"
     )
+    parser.add_argument(
+        "--keep_temporary_dims",
+        "-k",
+        action="store_true",
+        help="If set, do not delete temporary dimensions",
+    )
     return parser.parse_args()
 
 
-def mark_points_to_use_for_digital_models_with_new_dimension(
-    input_las, output_las, dsm_dimension, dtm_dimension, output_dsm, output_dtm
-):
+def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension):
     pipeline = pdal.Pipeline() | pdal.Reader.las(input_las)
 
     # 0 - ajout de dimensions temporaires et de sortie
-    added_dimensions = [
-        dtm_dimension,
-        dsm_dimension,
-        "PT_VEG_DSM",
-        "PT_ON_BRIDGE",
-        "PT_ON_BUILDING",
-        "PT_ON_VEGET",
-    ]
+    temporary_dimensions = ["PT_VEG_DSM", "PT_ON_BRIDGE", "PT_ON_BUILDING", "PT_ON_VEGET"]
+    added_dimensions = [dtm_dimension, dsm_dimension] + temporary_dimensions
+
     pipeline |= pdal.Filter.ferry(dimensions="=>" + ", =>".join(added_dimensions))
 
     # 1 - recherche des points max de végétation (4,5) sur une grille régulière, avec prise en
@@ -220,29 +222,53 @@ def mark_points_to_use_for_digital_models_with_new_dimension(
     )
     # ERREUR EN 4!###############################################################################################!
     # 5 - export du nuage et des DSM
-    # TODO: n'ajouter que les dimensions de sortie utiles !
 
     pipeline |= pdal.Writer.las(extra_dims="all", forward="all", filename=output_las)
 
-    if output_dtm:
-        pipeline |= pdal.Writer.gdal(
-            gdaldriver="GTiff",
-            output_type="max",
-            resolution=0.5,
-            filename=output_dtm,
-            where=f"{dtm_dimension}==1",
+    return pipeline, temporary_dimensions
+
+
+def mark_points_to_use_for_digital_models_with_new_dimension(
+    input_las,
+    output_las,
+    dsm_dimension,
+    dtm_dimension,
+    output_dsm,
+    output_dtm,
+    keep_temporary_dimensions=False,
+):
+    with tempfile.NamedTemporaryFile(suffix="_with_buffer.las", dir=".") as tmp_las:
+        pipeline, temporary_dimensions = define_marking_pipeline(
+            input_las,
+            tmp_las.name,
+            dsm_dimension,
+            dtm_dimension,
         )
 
-    if output_dsm:
-        pipeline |= pdal.Writer.gdal(
-            gdaldriver="GTiff",
-            output_type="max",
-            resolution=0.5,
-            filename=output_dsm,
-            where=f"{dsm_dimension}==1",
-        )
+        if output_dtm:
+            pipeline |= pdal.Writer.gdal(
+                gdaldriver="GTiff",
+                output_type="max",
+                resolution=0.5,
+                filename=output_dtm,
+                where=f"{dtm_dimension}==1",
+            )
 
-    pipeline.execute()
+        if output_dsm:
+            pipeline |= pdal.Writer.gdal(
+                gdaldriver="GTiff",
+                output_type="max",
+                resolution=0.5,
+                filename=output_dsm,
+                where=f"{dsm_dimension}==1",
+            )
+
+        pipeline.execute()
+
+        if keep_temporary_dimensions:
+            shutil.copy(tmp_las.name, output_las)
+        else:
+            remove_dimensions_from_las(tmp_las.name, temporary_dimensions, output_las)
 
 
 if __name__ == "__main__":

@@ -9,3 +9,6 @@ __pycache__
 
 *.egg-info
 *.idea
+
+# test output
+tmp

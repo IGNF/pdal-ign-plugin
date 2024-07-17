@@ -11,5 +11,5 @@ dependencies:
   # --------- pip & pip libraries --------- #
   - pip
   - pip:
-    - ign-pdal-tools
-    
+    - ign-pdal-tools==1.7.1
+

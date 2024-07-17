@@ -8,7 +8,7 @@ from pdal_ign_macro.mark_points_to_use_for_digital_models_with_new_dimension imp
 )
 
 
-def test_main():
+def test_mark_points_to_use_for_digital_models_with_new_dimension():
     ini_las = "test/data/4_6.las"
     dsm_dimension = "dsm_marker"
     dtm_dimension = "dtm_marker"
@@ -18,8 +18,16 @@ def test_main():
         )
         pipeline = pdal.Pipeline()
         pipeline |= pdal.Reader.las(las_output.name)
-        assert dsm_dimension in pipeline.quickinfo["readers.las"]["dimensions"].split(", ")
-        assert dtm_dimension in pipeline.quickinfo["readers.las"]["dimensions"].split(", ")
+        output_dimensions = pipeline.quickinfo["readers.las"]["dimensions"].split(", ")
+        assert dsm_dimension in output_dimensions
+        assert dtm_dimension in output_dimensions
+
+        assert all(
+            [
+                dim not in output_dimensions
+                for dim in ["PT_VEG_DSM", "PT_ON_BRIDGE", "PT_ON_BUILDING", "PT_ON_VEGET"]
+            ]
+        )
 
         pipeline.execute()
         arr = pipeline.arrays[0]
