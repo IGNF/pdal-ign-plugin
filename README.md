@@ -31,9 +31,8 @@ The code is structured as:
 ├── macro  # Python module with ready-to-use filters combinations
 │   ├── __init__.py
 │   ├── macro.py
-│   └── version.py
-├── scripts
-│   ├── *.py  # Example scripts to use the plugin filters + the filters combinations contained in `macro`
+│   ├── version.py
+│   └── *.py  # Example scripts to use the plugin filters + the filters combinations contained in `macro`
 ├── test
 ├── CMakeLists.txt
 ├── environment*.yml
