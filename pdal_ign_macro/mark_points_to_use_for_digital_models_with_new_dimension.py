@@ -14,7 +14,7 @@ It adds dimensions with positive values for the selected points
 """
 
 
-def parse_args():
+def parse_args(argv=None):
     parser = argparse.ArgumentParser(
         "Tool to apply pdal pipelines to select points for DSM and DTM calculation"
         + "(add dimensions with positive values for the selected points)"
@@ -51,7 +51,6 @@ def parse_args():
     )
     parser.add_argument(
         "--skip_buffer",
-        "-s",
         action="store_true",
         help="If set, skip adding a buffer from the neighbor tiles based on their name",
     )
@@ -71,18 +70,16 @@ def parse_args():
         "--tile_width",
         type=int,
         default=1000,
-        action="store_true",
         help="width of tiles in meters (required when running with a buffer)",
     )
     parser.add_argument(
         "--tile_coord_scale",
         type=int,
         default=1000,
-        action="store_true",
         help="scale used in the filename to describe coordinates in meters (required when running with a buffer)",
     )
 
-    return parser.parse_args()
+    return parser.parse_args(argv)
 
 
 def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension):
@@ -352,7 +349,7 @@ def main(
     dtm_dimension,
     output_dsm,
     output_dtm,
-    keep_temporary_dimensions=False,
+    keep_temporary_dims=False,
     skip_buffer=False,
     buffer_width=25,
     spatial_ref="EPSG:2154",
@@ -367,7 +364,7 @@ def main(
             dtm_dimension,
             output_dsm,
             output_dtm,
-            keep_temporary_dimensions,
+            keep_temporary_dims,
         )
     else:
         mark_with_buffer = run_on_buffered_las(
@@ -381,7 +378,7 @@ def main(
             dtm_dimension,
             output_dsm,
             output_dtm,
-            keep_temporary_dimensions,
+            keep_temporary_dims,
         )
 
 

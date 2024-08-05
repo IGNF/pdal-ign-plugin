@@ -1,3 +1,4 @@
+import inspect
 import tempfile
 
 import numpy as np
@@ -6,6 +7,7 @@ import pdal
 from pdal_ign_macro.mark_points_to_use_for_digital_models_with_new_dimension import (
     main,
     mark_points_to_use_for_digital_models_with_new_dimension,
+    parse_args,
 )
 
 
@@ -76,7 +78,7 @@ def test_main_no_buffer():
             dtm_dimension,
             "",
             "",
-            keep_temporary_dimensions=False,
+            keep_temporary_dims=False,
             skip_buffer=True,
         )
         pipeline = pdal.Pipeline()
@@ -103,7 +105,7 @@ def test_main_with_buffer():
             dtm_dimension,
             "",
             "",
-            keep_temporary_dimensions=False,
+            keep_temporary_dims=False,
             skip_buffer=False,
             buffer_width=10,
             tile_width=50,
@@ -119,3 +121,13 @@ def test_main_with_buffer():
         arr = pipeline.arrays[0]
         assert np.any(arr[dsm_dimension] == 1)
         assert np.any(arr[dtm_dimension] == 1)
+
+
+def test_parse_args():
+    # sanity check for arguments parsing
+    args = parse_args(
+        ["--input_las", "test/data/4_6.las", "--output_las", "tmp/parse_args_out.las"]
+    )
+    parsed_args_keys = args.__dict__.keys()
+    main_parameters = inspect.signature(main).parameters.keys()
+    assert parsed_args_keys == main_parameters
