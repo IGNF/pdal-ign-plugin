@@ -1,3 +1,7 @@
+### 0.3.0
+
+Update algorithm of [mark_points_to_use_for_digital_models_with_new_dimension](pdal_ign_macro/mark_points_to_use_for_digital_models_with_new_dimension.py), 
+
 ### 0.2.1
 
 Fix (and test) arguments parsing in [mark_points_to_use_for_digital_models_with_new_dimension](pdal_ign_macro/mark_points_to_use_for_digital_models_with_new_dimension.py)
