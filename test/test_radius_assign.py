@@ -98,9 +98,9 @@ def build_random_points_around_one_point(test_function, distance_radius):
         pt_i = (pti_x, pti_y, pti_z, 2)
 
         # too much uncertainty between the digital precisions of pdal and the tests
-        if abs(distance2d(pt_i, pt_ini) - distance_radius) < numeric_precision:
+        if abs(distance2d(pt_i, pt_ini) - distance_radius) < 1 / numeric_precision:
             continue
-        if abs(distance3d(pt_i, pt_ini) - distance_radius) < numeric_precision:
+        if abs(distance3d(pt_i, pt_ini) - distance_radius) < 1 / numeric_precision:
             continue
 
         arrays_pti = np.array([pt_i], dtype=dtype)
@@ -153,13 +153,14 @@ def test_radius_assign_2d():
         (2, -1),  # limit above only
         (0, -1),  # take all points below only
         (-1, 0),  # take all points above only
+        (-0.5, 0.5),
+        (-0.5, 0.25),
+        (-0.005, 0.005),  # other tests
     ],
 )
 def test_radius_assign_2d_cylinder(limit_z_above, limit_z_below):
 
     distance_radius = 1
-    limit_z_above = 0.25
-    limit_z_below = 0.25
 
     def func_test(pt):
         distance_i = distance2d(pt_ini, pt)
@@ -168,12 +169,18 @@ def test_radius_assign_2d_cylinder(limit_z_above, limit_z_below):
                 return 1
             if (limit_z_below >= 0) and ((pt_ini[2] - pt[2]) <= limit_z_below):
                 return 1
+            if limit_z_above < 0 and limit_z_below < 0:
+                return 1
         return 0
 
     arrays_las, nb_points_take_2d = build_random_points_around_one_point(
         func_test, distance_radius
     )
+
+    assert len(arrays_las) > 0
+
     nb_pts_radius_2d_cylinder = run_filter(
         arrays_las, distance_radius, False, limit_z_above, limit_z_below
     )
+
     assert nb_pts_radius_2d_cylinder == nb_points_take_2d
