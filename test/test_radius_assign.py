@@ -178,7 +178,7 @@ def test_radius_assign_2d_cylinder_above():
     assert nb_pts_radius_2d_cylinder == nb_points_take_2d
 
 
-def test_radius_assign_2d_cylinder_above_bellow_null():
+def test_radius_assign_2d_cylinder_above_below_null():
 
     limit_z_below = 0
     limit_z_above = 0
