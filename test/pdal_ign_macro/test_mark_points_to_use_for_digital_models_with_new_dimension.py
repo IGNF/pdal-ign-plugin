@@ -158,8 +158,6 @@ def test_algo_mark_points_for_dm_with_reference(crop):
             keep_temporary_dims=False,
             skip_buffer=True,
         )
-        pipeline = pdal.Pipeline()
-        pipeline.execute()
 
         def sort_points(points):
             sorted_index = np.lexsort((points["Y"], points["X"], points["Z"], points["GpsTime"]))
