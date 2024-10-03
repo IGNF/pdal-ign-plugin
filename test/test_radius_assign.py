@@ -14,6 +14,7 @@ pt_z = 7072.1
 pt_ini = (pt_x, pt_y, pt_z, 1)
 
 numeric_precision = 4
+distance_radius = 1
 
 
 def distance2d(pt1, pt2):
@@ -74,7 +75,7 @@ def run_filter(arrays_las, distance_radius, search_3d, limit_z_above=-1, limit_w
     return nb_pts_radius_search
 
 
-def build_random_points_around_one_point(test_function, distance_radius):
+def build_random_points_around_one_point(test_function):
 
     dtype = [("X", "<f8"), ("Y", "<f8"), ("Z", "<f8"), ("Classification", "u1")]
     arrays_las = np.array([pt_ini], dtype=dtype)
@@ -113,24 +114,18 @@ def build_random_points_around_one_point(test_function, distance_radius):
 
 def test_radius_assign_3d():
 
-    distance_radius = 1
-
     def func_test(pt):
         distance_i = distance3d(pt_ini, pt)
         if distance_i < distance_radius:
             return 1
         return 0
 
-    arrays_las, nb_points_take_3d = build_random_points_around_one_point(
-        func_test, distance_radius
-    )
+    arrays_las, nb_points_take_3d = build_random_points_around_one_point(func_test)
     nb_pts_radius_3d = run_filter(arrays_las, distance_radius, True)
     assert nb_pts_radius_3d == nb_points_take_3d
 
 
 def test_radius_assign_2d():
-
-    distance_radius = 1
 
     def func_test(pt):
         distance_i = distance2d(pt_ini, pt)
@@ -138,11 +133,133 @@ def test_radius_assign_2d():
             return 1
         return 0
 
-    arrays_las, nb_points_take_2d = build_random_points_around_one_point(
-        func_test, distance_radius
-    )
+    arrays_las, nb_points_take_2d = build_random_points_around_one_point(func_test)
     nb_pts_radius_2d = run_filter(arrays_las, distance_radius, False)
     assert nb_pts_radius_2d == nb_points_take_2d
+
+
+def test_radius_assign_2d_cylinder_below():
+
+    limit_z_below = 1.75
+    limit_z_above = -1
+
+    def func_test(pt):
+        distance_i = distance2d(pt_ini, pt)
+        distance_z = pt[2] - pt_ini[2]
+        if distance_i < distance_radius and distance_z < limit_z_below:
+            return 1
+        return 0
+
+    arrays_las, nb_points_take_2d = build_random_points_around_one_point(func_test)
+
+    nb_pts_radius_2d_cylinder = run_filter(
+        arrays_las, distance_radius, False, limit_z_above, limit_z_below
+    )
+    assert nb_pts_radius_2d_cylinder == nb_points_take_2d
+
+
+def test_radius_assign_2d_cylinder_above():
+
+    limit_z_below = -1
+    limit_z_above = 1.75
+
+    def func_test(pt):
+        distance_i = distance2d(pt_ini, pt)
+        distance_z = pt_ini[2] - pt[2]
+        if distance_i < distance_radius and distance_z < limit_z_above:
+            return 1
+        return 0
+
+    arrays_las, nb_points_take_2d = build_random_points_around_one_point(func_test)
+
+    nb_pts_radius_2d_cylinder = run_filter(
+        arrays_las, distance_radius, False, limit_z_above, limit_z_below
+    )
+    assert nb_pts_radius_2d_cylinder == nb_points_take_2d
+
+
+def test_radius_assign_2d_cylinder_above_bellow_null():
+
+    limit_z_below = 0
+    limit_z_above = 0
+
+    def func_test(pt):
+        distance_i = distance2d(pt_ini, pt)
+        distance_z = pt_ini[2] - pt[2]
+        if distance_i < distance_radius and distance_z == 0:
+            return 1
+        return 0
+
+    arrays_las, nb_points_take_2d = build_random_points_around_one_point(func_test)
+
+    nb_pts_radius_2d_cylinder = run_filter(
+        arrays_las, distance_radius, False, limit_z_above, limit_z_below
+    )
+    assert nb_pts_radius_2d_cylinder == nb_points_take_2d
+
+
+def test_radius_assign_2d_cylinder_above_null_bellow_all():
+
+    limit_z_below = 0
+    limit_z_above = -1
+
+    def func_test(pt):
+        distance_i = distance2d(pt_ini, pt)
+        distance_z = pt[2] - pt_ini[2]
+        if distance_i < distance_radius and distance_z <= 0:
+            return 1
+        return 0
+
+    arrays_las, nb_points_take_2d = build_random_points_around_one_point(func_test)
+
+    nb_pts_radius_2d_cylinder = run_filter(
+        arrays_las, distance_radius, False, limit_z_above, limit_z_below
+    )
+    assert nb_pts_radius_2d_cylinder == nb_points_take_2d
+
+
+def test_radius_assign_2d_cylinder_above_bellow_all():
+
+    limit_z_below = -1
+    limit_z_above = -1
+
+    def func_test(pt):
+        distance_i = distance2d(pt_ini, pt)
+        if distance_i < distance_radius:
+            return 1
+        return 0
+
+    arrays_las, nb_points_take_2d = build_random_points_around_one_point(func_test)
+
+    nb_pts_radius_2d_cylinder = run_filter(
+        arrays_las, distance_radius, False, limit_z_above, limit_z_below
+    )
+    assert nb_pts_radius_2d_cylinder == nb_points_take_2d
+
+
+@pytest.mark.parametrize("execution_number", range(10))
+def test_radius_assign_2d_cylinder_above_and_bellow(execution_number):
+
+    limit_z_below = rand.uniform(0, 2)
+    limit_z_above = rand.uniform(0, 2)
+
+    def func_test(pt):
+        distance_i = distance2d(pt_ini, pt)
+        distance_z = pt_ini[2] - pt[2]
+        if (
+            distance_i < distance_radius
+            and distance_z <= limit_z_above
+            and (-distance_z) <= limit_z_below
+        ):
+            return 1
+        return 0
+
+    arrays_las, nb_points_take_2d = build_random_points_around_one_point(func_test)
+
+    nb_pts_radius_2d_cylinder = run_filter(
+        arrays_las, distance_radius, False, limit_z_above, limit_z_below
+    )
+    assert nb_pts_radius_2d_cylinder == nb_points_take_2d
 
 
 @pytest.mark.parametrize(
@@ -165,25 +282,15 @@ def test_radius_assign_2d_cylinder(limit_z_above, limit_z_below):
     def func_test(pt):
         distance_i = distance2d(pt_ini, pt)
         if distance_i < distance_radius:
-            if (
-                (limit_z_above >= 0)
-                and pt[2] < pt_ini[2]
-                and ((pt[2] - pt_ini[2]) > limit_z_above)
-            ):
+            if (limit_z_above >= 0) and ((pt_ini[2] - pt[2]) > limit_z_above):
                 return 0
-            if (
-                (limit_z_below >= 0)
-                and pt[2] > pt_ini[2]
-                and ((pt_ini[2] - pt[2]) > limit_z_below)
-            ):
+            if (limit_z_below >= 0) and ((pt[2] - pt_ini[2]) > limit_z_below):
                 return 0
             return 1
         else:
             return 0
 
-    arrays_las, nb_points_take_2d = build_random_points_around_one_point(
-        func_test, distance_radius
-    )
+    arrays_las, nb_points_take_2d = build_random_points_around_one_point(func_test)
 
     assert len(arrays_las) > 0
 

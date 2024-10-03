@@ -87,8 +87,8 @@ void RadiusAssignFilter::doOneNoDomain(PointRef &point)
             for (PointId ptId : iNeighbors)
             {
                 double Zpt = refView->point(ptId).getFieldAs<double>(Dimension::Id::Z);
-                if (m_args->m_max2d_below>=0 && Zref<Zpt && (Zref-Zpt)>m_args->m_max2d_below) {take=false; break;}
-                if (m_args->m_max2d_above>=0 && Zref>Zpt && (Zpt-Zref)>m_args->m_max2d_above) {take=false; break;}
+                if (m_args->m_max2d_below>=0 && (Zref-Zpt)>m_args->m_max2d_below) {take=false; break;}
+                if (m_args->m_max2d_above>=0 && (Zpt-Zref)>m_args->m_max2d_above) {take=false; break;}
             }
             if (!take) return;
         }
