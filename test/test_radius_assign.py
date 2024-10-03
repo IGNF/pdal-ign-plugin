@@ -103,6 +103,8 @@ def build_random_points_around_one_point(test_function, distance_radius):
         if abs(distance3d(pt_i, pt_ini) - distance_radius) < 1 / numeric_precision:
             continue
 
+        print("pt_i", pt_i)
+
         arrays_pti = np.array([pt_i], dtype=dtype)
         arrays_las = np.concatenate((arrays_las, arrays_pti), axis=0)
 
@@ -162,12 +164,16 @@ def test_radius_assign_2d_cylinder(limit_z_above, limit_z_below):
 
     distance_radius = 1
 
+    print("pt_ini", pt_ini)
+
     def func_test(pt):
         distance_i = distance2d(pt_ini, pt)
         if distance_i < distance_radius:
             if (limit_z_above >= 0) and ((pt[2] - pt_ini[2]) <= limit_z_above):
+                print("above", pt[2], pt_ini[2], pt[2] - pt_ini[2], limit_z_above)
                 return 1
             if (limit_z_below >= 0) and ((pt_ini[2] - pt[2]) <= limit_z_below):
+                print("below", pt[2], pt_ini[2], pt_ini[2] - pt[2], limit_z_below)
                 return 1
             if limit_z_above < 0 and limit_z_below < 0:
                 return 1
