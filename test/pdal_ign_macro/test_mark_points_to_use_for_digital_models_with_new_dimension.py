@@ -138,7 +138,7 @@ def test_parse_args():
     "crop",
     [
         "crop_1.laz",
-        # "crop_2.laz", ToDo : rebuilt the reference crop_2 wich is false
+        # "crop_2.laz", ToDo : rebuild the reference for crop_2 which is false
         "crop_3.laz",
     ],
 )
