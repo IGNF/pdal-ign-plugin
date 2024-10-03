@@ -149,8 +149,8 @@ def test_radius_assign_2d():
     "limit_z_above, limit_z_below",
     [
         (-1, -1),  # no limit
-        (-1, 2),  # limit below only
-        (2, -1),  # limit above only
+        (-1, 1.75),  # limit below only
+        (1.75, -1),  # limit above only
         (0, -1),  # take all points below only
         (-1, 0),  # take all points above only
         (-0.5, 0.5),
