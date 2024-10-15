@@ -140,6 +140,9 @@ def test_parse_args():
         "crop_1.laz",
         # "crop_2.laz", ToDo : rebuild the reference for crop_2 which is false
         "crop_3.laz",
+        "bat.laz",
+        "pont.laz",
+        "corse.laz",
     ],
 )
 def test_algo_mark_points_for_dm_with_reference(crop):
