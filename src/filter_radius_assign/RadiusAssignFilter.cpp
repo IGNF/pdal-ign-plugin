@@ -82,16 +82,17 @@ void RadiusAssignFilter::doOneNoDomain(PointRef &pointSrc)
     {
         double Zsrc = pointSrc.getFieldAs<double>(Dimension::Id::Z);
         
-        std::set<double> ZNeib;
+        bool take (false);
         for (PointId ptId : iNeighbors)
         {
             double Zref = refView->point(ptId).getFieldAs<double>(Dimension::Id::Z);
             if (m_args->m_max2d_above>=0 && Zref>Zsrc && (Zref-Zsrc)>m_args->m_max2d_above) continue;
             if (m_args->m_max2d_below>=0 && Zsrc>Zref && (Zsrc-Zref)>m_args->m_max2d_below) continue;
-            ZNeib.insert(Zref);
+            take = true;
+            break;
         }
 
-        if (ZNeib.size()==0) return;
+        if (!take) return;
     }
 
     m_args->m_ptsToUpdate.push_back(pointSrc.pointId());

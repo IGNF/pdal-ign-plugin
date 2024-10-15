@@ -57,7 +57,12 @@ def test_mark_points_to_use_for_digital_models_with_new_dimension_keep_dimension
         assert all(
             [
                 dim in output_dimensions
-                for dim in ["PT_VEG_DSM", "PT_ON_BRIDGE", "PT_ON_BUILDING", "PT_ON_VEGET"]
+                for dim in [
+                    "PT_VEG_DSM",
+                    "PT_UNDER_BRIDGE",
+                    "PT_CLOSED_BUILDING",
+                    "PT_UNDER_VEGET",
+                ]
             ]
         )
 

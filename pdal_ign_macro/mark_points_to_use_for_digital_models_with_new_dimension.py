@@ -88,9 +88,9 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
     # 0 - ajout de dimensions temporaires et de sortie
     temporary_dimensions = [
         "PT_VEG_DSM",
-        "PT_ON_BRIDGE",
-        "PT_ON_BUILDING",
-        "PT_ON_VEGET",
+        "PT_UNDER_BRIDGE",
+        "PT_CLOSED_BUILDING",
+        "PT_UNDER_VEGET",
         "PT_ON_SOL",
         "PT_ON_VIRT",
     ]
@@ -128,14 +128,14 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
         condition_ref="Classification==2 && PT_VEG_DSM==0",
         condition_out="PT_VEG_DSM=0",
     )
-    # 1.3 Isolement en PT_ON_VEGET=1 des éléments sous la végétation (hors sol)
+    # 1.3 Isolement en PT_UNDER_VEGET=1 des éléments sous la végétation (hors sol)
     pipeline = macro.add_radius_assign(
         pipeline,
         1,
         False,
         condition_src=macro.build_condition("Classification", [6, 9, 17, 67]),
         condition_ref=macro.build_condition("Classification", [4, 5]),
-        condition_out="PT_ON_VEGET=1",
+        condition_out="PT_UNDER_VEGET=1",
         max2d_above=-1,
         max2d_below=0,
     )
@@ -143,13 +143,13 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
         pipeline,
         1,
         False,
-        condition_src="PT_ON_VEGET==1 && ( "
+        condition_src="PT_UNDER_VEGET==1 && ( "
         + macro.build_condition("Classification", [6, 9, 17, 67])
         + " )",
-        condition_ref="PT_ON_VEGET==0 && ( "
+        condition_ref="PT_UNDER_VEGET==0 && ( "
         + macro.build_condition("Classification", [6, 9, 17, 67])
         + " )",
-        condition_out="PT_ON_VEGET=0",
+        condition_out="PT_UNDER_VEGET=0",
         max2d_above=0.5,
         max2d_below=0.5,
     )
@@ -232,7 +232,7 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
         resolution=0.5,
         output_dimension=dsm_dimension,
         output_type="max",
-        where="(PT_ON_VEGET==0 && ("
+        where="(PT_UNDER_VEGET==0 && ("
         + macro.build_condition("Classification", [6, 17, 67])
         + f") || {dsm_dimension}==1)",
     )
@@ -247,7 +247,7 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
         resolution=0.5,
         output_dimension=dsm_dimension,
         output_type="min",
-        where="(PT_ON_VEGET==0 && PT_ON_SOL==0 && PT_ON_VIRT==0 && Classification==9)",
+        where="(PT_UNDER_VEGET==0 && PT_ON_SOL==0 && PT_ON_VIRT==0 && Classification==9)",
     )
     ###################################################################################################################
     # 4 - Gestion des points sol sous la veget,bâtis et ponts pour le MNS
@@ -271,14 +271,14 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
         False,
         condition_src="Classification==2 && PT_VEG_DSM==0",
         condition_ref=macro.build_condition("Classification", [6, 67]),
-        condition_out="PT_ON_BUILDING=1",
+        condition_out="PT_CLOSED_BUILDING=1",
     )
     pipeline = macro.add_radius_assign(
         pipeline,
         1,
         False,
-        condition_src=f"Classification==2 && {dsm_dimension}==0 && PT_ON_BUILDING==1 && {dtm_dimension}==1",
-        condition_ref="Classification==2 && PT_ON_BUILDING==0 && PT_VEG_DSM==0",
+        condition_src=f"Classification==2 && {dsm_dimension}==0 && PT_CLOSED_BUILDING==1 && {dtm_dimension}==1",
+        condition_ref="Classification==2 && PT_CLOSED_BUILDING==0 && PT_VEG_DSM==0",
         condition_out=f"{dsm_dimension}=1",
     )
     ###################################################################################################################
@@ -291,29 +291,29 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
         False,
         condition_src=macro.build_condition("Classification", [2, 3, 4, 5, 6, 9, 67]),
         condition_ref="Classification==17",
-        condition_out="PT_ON_BRIDGE=1",
-        max2d_above=-1,  # ne pas prendre les points qui sont en dessous des points pont (condition_ref)
-        max2d_below=0,  # prendre tous les points qui sont au dessus des points pont (condition_ref)
+        condition_out="PT_UNDER_BRIDGE=1",
+        max2d_above=-1,  # prendre les points (condition_src) qui on des points ponts au dessus d'eux (condition_ref)
+        max2d_below=0,
     )
     pipeline = macro.add_radius_assign(
         pipeline,
         1.25,
         False,
-        condition_src="PT_ON_BRIDGE==1",
-        condition_ref="PT_ON_BRIDGE==0 && "
+        condition_src="PT_UNDER_BRIDGE==1",
+        condition_ref="PT_UNDER_BRIDGE==0 && "
         + macro.build_condition("Classification", [2, 3, 4, 5, 6, 9, 67]),
-        condition_out="PT_ON_BRIDGE=0",
-        max2d_above=0.5,  # ne pas prendre les points qui sont en dessous des points pont (condition_ref)
-        max2d_below=0.5,  # prendre tous les points qui sont au dessus des points pont (condition_ref)
+        condition_out="PT_UNDER_BRIDGE=0",
+        max2d_above=0.5,
+        max2d_below=0.5,
     )
-    pipeline |= pdal.Filter.assign(value=[f"{dsm_dimension}=0 WHERE PT_ON_BRIDGE==1"])
+    pipeline |= pdal.Filter.assign(value=[f"{dsm_dimension}=0 WHERE PT_UNDER_BRIDGE==1"])
     ###################################################################################################################
     # 6 - Ajout des point pour MNT (sol) qui servent au MNS également
     ###################################################################################################################
 
     pipeline |= pdal.Filter.assign(
         value=[
-            f"{dsm_dimension}=1 WHERE ({dtm_dimension}==1 && PT_VEG_DSM==0 && PT_ON_BRIDGE==0 && PT_ON_BUILDING==0 && PT_ON_VEGET==0)"
+            f"{dsm_dimension}=1 WHERE ({dtm_dimension}==1 && PT_VEG_DSM==0 && PT_UNDER_BRIDGE==0 && PT_CLOSED_BUILDING==0 && PT_UNDER_VEGET==0)"
         ]
     )
 
@@ -333,15 +333,15 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
         False,
         condition_src="Classification==66",
         condition_ref=macro.build_condition("Classification", [4, 5, 6, 17, 67]),
-        condition_out="PT_ON_VEGET=1",
+        condition_out="PT_UNDER_VEGET=1",
     )
     pipeline = macro.add_radius_assign(
         pipeline,
         0.5,
         False,
-        condition_src="PT_ON_VEGET==1 && Classification==66",
-        condition_ref="PT_ON_VEGET==0 && Classification==66",
-        condition_out="PT_ON_VEGET=0",
+        condition_src="PT_UNDER_VEGET==1 && Classification==66",
+        condition_ref="PT_UNDER_VEGET==0 && Classification==66",
+        condition_out="PT_UNDER_VEGET=0",
     )
     # 7.3 Taguage pour les MNS des points virtuels eau seulement
     pipeline = macro.add_radius_assign(
@@ -350,11 +350,11 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
         False,
         condition_src="Classification==66",
         condition_ref="Classification==17",
-        condition_out="PT_ON_BRIDGE=1",
+        condition_out="PT_UNDER_BRIDGE=1",
     )
     pipeline |= pdal.Filter.assign(
         value=[
-            f"{dsm_dimension}=1 WHERE (Classification==66 && PT_ON_VEGET==0 && PT_ON_BRIDGE==0)"
+            f"{dsm_dimension}=1 WHERE (Classification==66 && PT_UNDER_VEGET==0 && PT_UNDER_BRIDGE==0)"
         ]
     )
 
