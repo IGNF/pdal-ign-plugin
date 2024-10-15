@@ -136,8 +136,8 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
         condition_src=macro.build_condition("Classification", [6, 9, 17, 67]),
         condition_ref=macro.build_condition("Classification", [4, 5]),
         condition_out="PT_ON_VEGET=1",
-        max2d_above=0,
-        max2d_below=-1,
+        max2d_above=-1,
+        max2d_below=0,
     )
     pipeline = macro.add_radius_assign(
         pipeline,
@@ -182,8 +182,8 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
         condition_src="Classification==9",
         condition_ref="Classification==2",
         condition_out="PT_ON_SOL=1",
-        max2d_above=0,
-        max2d_below=-1,
+        max2d_above=-1,
+        max2d_below=0,
     )
     pipeline = macro.add_radius_assign(
         pipeline,
@@ -292,8 +292,8 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
         condition_src=macro.build_condition("Classification", [2, 3, 4, 5, 6, 9, 67]),
         condition_ref="Classification==17",
         condition_out="PT_ON_BRIDGE=1",
-        max2d_above=0,  # ne pas prendre les points qui sont au dessus des points pont (condition_ref)
-        max2d_below=-1,  # prendre tous les points qui sont en dessous des points pont (condition_ref)
+        max2d_above=-1,  # ne pas prendre les points qui sont en dessous des points pont (condition_ref)
+        max2d_below=0,  # prendre tous les points qui sont au dessus des points pont (condition_ref)
     )
     pipeline = macro.add_radius_assign(
         pipeline,
@@ -303,8 +303,8 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
         condition_ref="PT_ON_BRIDGE==0 && "
         + macro.build_condition("Classification", [2, 3, 4, 5, 6, 9, 67]),
         condition_out="PT_ON_BRIDGE=0",
-        max2d_above=0.5,  # ne pas  prendre les points qui sont au dessus des points pont (condition_ref)
-        max2d_below=0.5,  # prendre tous les points qui sont en dessous des points pont (condition_ref)
+        max2d_above=0.5,  # ne pas prendre les points qui sont en dessous des points pont (condition_ref)
+        max2d_below=0.5,  # prendre tous les points qui sont au dessus des points pont (condition_ref)
     )
     pipeline |= pdal.Filter.assign(value=[f"{dsm_dimension}=0 WHERE PT_ON_BRIDGE==1"])
     ###################################################################################################################
