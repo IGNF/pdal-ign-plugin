@@ -68,33 +68,33 @@ void RadiusAssignFilter::ready(PointTableRef)
     m_args->m_ptsToUpdate.clear();
 }
 
-void RadiusAssignFilter::doOneNoDomain(PointRef &point)
+void RadiusAssignFilter::doOneNoDomain(PointRef &pointSrc)
 {
     // build3dIndex and build2dIndex are build once
     PointIdList iNeighbors;
-    if (m_args->search3d) iNeighbors = refView->build3dIndex().radius(point, m_args->m_radius);
-    else iNeighbors = refView->build2dIndex().radius(point, m_args->m_radius);
+    if (m_args->search3d) iNeighbors = refView->build3dIndex().radius(pointSrc, m_args->m_radius);
+    else iNeighbors = refView->build2dIndex().radius(pointSrc, m_args->m_radius);
 
     if (iNeighbors.size() == 0)
         return;
 
-    if (!m_args->search3d)
+    if (!m_args->search3d && (m_args->m_max2d_below>=0 || m_args->m_max2d_above>=0))
     {
-        double Zref = point.getFieldAs<double>(Dimension::Id::Z);
-        if (m_args->m_max2d_below>=0 || m_args->m_max2d_above>=0)
+        double Zsrc = pointSrc.getFieldAs<double>(Dimension::Id::Z);
+
+        std::set<double> ZNeib;
+        for (PointId ptId : iNeighbors)
         {
-            bool take (true);
-            for (PointId ptId : iNeighbors)
-            {
-                double Zpt = refView->point(ptId).getFieldAs<double>(Dimension::Id::Z);
-                if (m_args->m_max2d_below>=0 && (Zref-Zpt)>m_args->m_max2d_below) {take=false; break;}
-                if (m_args->m_max2d_above>=0 && (Zpt-Zref)>m_args->m_max2d_above) {take=false; break;}
-            }
-            if (!take) return;
+            double Zref = refView->point(ptId).getFieldAs<double>(Dimension::Id::Z);
+            if (m_args->m_max2d_above>=0 && Zref>Zsrc && (Zref-Zsrc)>m_args->m_max2d_above) continue;
+            if (m_args->m_max2d_below>=0 && Zsrc>Zref && (Zsrc-Zref)>m_args->m_max2d_below) continue;
+            ZNeib.insert(Zref);
         }
+
+        if (ZNeib.size()==0) return;
     }
 
-    m_args->m_ptsToUpdate.push_back(point.pointId());
+    m_args->m_ptsToUpdate.push_back(pointSrc.pointId());
 }
 
 bool RadiusAssignFilter::doOne(PointRef& point)
