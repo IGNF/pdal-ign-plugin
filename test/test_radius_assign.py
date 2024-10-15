@@ -14,6 +14,7 @@ pt_z = 7072.1
 pt_ini = (pt_x, pt_y, pt_z, 1)
 
 numeric_precision = 4
+numeric_precision_z = 2
 distance_radius = 1
 
 
@@ -26,6 +27,10 @@ def distance3d(pt1, pt2):
         math.sqrt((pt1[0] - pt2[0]) ** 2 + (pt1[1] - pt2[1]) ** 2 + (pt1[2] - pt2[2]) ** 2),
         numeric_precision,
     )
+
+
+def distanceZ(pt1, pt2):
+    return round(pt1[2] - pt2[2], numeric_precision_z)
 
 
 def run_filter(arrays_las, distance_radius, search_3d, limit_z_above=-1, limit_w_below=-1):
@@ -154,7 +159,7 @@ def test_radius_assign_2d_cylinder_below():
 
     def func_test(pt):
         distance_i = distance2d(pt_ini, pt)
-        distance_z = pt[2] - pt_ini[2]
+        distance_z = distanceZ(pt, pt_ini)
         if distance_i < distance_radius and distance_z < limit_z_below:
             return 1
         return 0
@@ -177,7 +182,7 @@ def test_radius_assign_2d_cylinder_above():
 
     def func_test(pt):
         distance_i = distance2d(pt_ini, pt)
-        distance_z = pt_ini[2] - pt[2]
+        distance_z = distanceZ(pt_ini, pt)
         if distance_i < distance_radius and distance_z < limit_z_above:
             return 1
         return 0
@@ -197,7 +202,7 @@ def test_radius_assign_2d_cylinder_above_below_null():
 
     def func_test(pt):
         distance_i = distance2d(pt_ini, pt)
-        distance_z = pt_ini[2] - pt[2]
+        distance_z = distanceZ(pt_ini, pt)
         if distance_i < distance_radius and distance_z == 0:
             return 1
         return 0
@@ -217,7 +222,7 @@ def test_radius_assign_2d_cylinder_above_null_bellow_all():
 
     def func_test(pt):
         distance_i = distance2d(pt_ini, pt)
-        distance_z = pt[2] - pt_ini[2]
+        distance_z = distanceZ(pt, pt_ini)
         if distance_i < distance_radius and distance_z <= 0:
             return 1
         return 0
@@ -261,13 +266,12 @@ def test_radius_assign_2d_cylinder_above_and_bellow(execution_number):
 
     def func_test(pt):
         distance_i = distance2d(pt_ini, pt)
-        distance_z = pt_ini[2] - pt[2]
-        if (
-            distance_i < distance_radius
-            and distance_z <= limit_z_above
-            and (-distance_z) <= limit_z_below
-        ):
-            return 1
+        distance_z = distanceZ(pt, pt_ini)  # src - ref
+        if distance_i < distance_radius:
+            if distance_z <= 0 and (-distance_z) <= limit_z_above:  # src est sur ref
+                return 1
+            if distance_z >= 0 and distance_z <= limit_z_below:  # src est sous ref
+                return 1
         return 0
 
     arrays_las, nb_points_take_2d = build_random_points_around_one_point(func_test, points)
@@ -298,9 +302,10 @@ def test_radius_assign_2d_cylinder(limit_z_above, limit_z_below):
     def func_test(pt):
         distance_i = distance2d(pt_ini, pt)
         if distance_i < distance_radius:
-            if (limit_z_above >= 0) and ((pt_ini[2] - pt[2]) > limit_z_above):
+            distance_z = distanceZ(pt, pt_ini)  # src - ref
+            if limit_z_above >= 0 and distance_z <= 0 and (-distance_z) > limit_z_above:
                 return 0
-            if (limit_z_below >= 0) and ((pt[2] - pt_ini[2]) > limit_z_below):
+            if limit_z_below >= 0 and distance_z >= 0 and distance_z > limit_z_below:
                 return 0
             return 1
         else:

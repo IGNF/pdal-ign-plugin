@@ -74,14 +74,14 @@ void RadiusAssignFilter::doOneNoDomain(PointRef &pointSrc)
     PointIdList iNeighbors;
     if (m_args->search3d) iNeighbors = refView->build3dIndex().radius(pointSrc, m_args->m_radius);
     else iNeighbors = refView->build2dIndex().radius(pointSrc, m_args->m_radius);
-
+    
     if (iNeighbors.size() == 0)
         return;
 
     if (!m_args->search3d && (m_args->m_max2d_below>=0 || m_args->m_max2d_above>=0))
     {
         double Zsrc = pointSrc.getFieldAs<double>(Dimension::Id::Z);
-
+        
         std::set<double> ZNeib;
         for (PointId ptId : iNeighbors)
         {
