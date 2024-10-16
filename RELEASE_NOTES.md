@@ -1,3 +1,5 @@
+### 0.3.1
+
 - improve code readability in the radius_assign filter (Z limits part).
 - fix the script for MNx pre-processing (Z limits were inverted)
 - improve tests and test data
