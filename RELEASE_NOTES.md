@@ -1,7 +1,11 @@
-### 0.3.0
+- improve code readability in the radius_assign filter (Z limits part).
+- fix the script for MNx pre-processing (Z limits were inverted)
+- improve tests and test data
+
+## 0.3.0
 
 Update algorithm of [mark_points_to_use_for_digital_models_with_new_dimension](pdal_ign_macro/mark_points_to_use_for_digital_models_with_new_dimension.py)
-In details : 
+In details :
 - manage water and virtuals points,
 - update building consideration
 - 2 levels of water
