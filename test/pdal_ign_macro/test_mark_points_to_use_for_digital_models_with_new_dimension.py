@@ -57,7 +57,12 @@ def test_mark_points_to_use_for_digital_models_with_new_dimension_keep_dimension
         assert all(
             [
                 dim in output_dimensions
-                for dim in ["PT_VEG_DSM", "PT_ON_BRIDGE", "PT_ON_BUILDING", "PT_ON_VEGET"]
+                for dim in [
+                    "PT_VEG_DSM",
+                    "PT_UNDER_BRIDGE",
+                    "PT_CLOSED_BUILDING",
+                    "PT_UNDER_VEGET",
+                ]
             ]
         )
 
@@ -140,6 +145,9 @@ def test_parse_args():
         "crop_1.laz",
         # "crop_2.laz", ToDo : rebuild the reference for crop_2 which is false
         "crop_3.laz",
+        "bat.laz",
+        "pont.laz",
+        "corse.laz",
     ],
 )
 def test_algo_mark_points_for_dm_with_reference(crop):
