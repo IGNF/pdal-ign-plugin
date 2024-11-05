@@ -1,3 +1,5 @@
+- Add example to run a local python script in the pdal_ign_plugin docker image
+
 ### 0.3.1
 
 - improve code readability in the radius_assign filter (Z limits part).
