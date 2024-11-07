@@ -11,6 +11,8 @@ to be able to run the compilation in this environment.
 
 run ci/build.sh
 
+To be able to acces to the plugins set PDAL_DRIVER_PATH to ../pdal-ign-plugin/install/lib
+
 ### Windows
 
 one day, maybe...
