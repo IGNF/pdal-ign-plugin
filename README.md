@@ -11,6 +11,9 @@ to be able to run the compilation in this environment.
 
 run ci/build.sh
 
+Set the `PDAL_DRIVER_PATH` environment variable to point to `${THIS REPO}/install/lib`
+in order for pdal to find the plugins.
+
 ### Windows
 
 one day, maybe...
@@ -27,6 +30,7 @@ The code is structured as:
 │   │   ├── CMakeLists.txt
 ├── doc
 │   ├── pluginFilter.md
+├── examples  # examples of usage of the code or the docker image
 ├── ci
 ├── macro  # Python module with ready-to-use filters combinations
 │   ├── __init__.py
@@ -129,3 +133,11 @@ docker run \
     python /scripts/my_script.py --input /data/my_data_file.las -o /output/my_output.las
 ```
 
+Another example can be found in the [./example](./examples/) folder:
+
+Run the following command to run the [demo_script](./examples/demo_script.py) python script
+which copies an input las file into the output folder as a las1.4 file :
+
+```bash
+./examples/run_custom_script_in_docker_image.sh -i ./test/data/mnx/input/bat.laz -o ./tmp/demo -s ./examples/demo_script.py
+```
