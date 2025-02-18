@@ -32,7 +32,7 @@ The code is structured as:
 │   ├── pluginFilter.md
 ├── examples  # examples of usage of the code or the docker image
 ├── ci
-├── macro  # Python module with ready-to-use filters combinations
+├── pdal_ign_macro  # Python module with ready-to-use filters combinations
 │   ├── __init__.py
 │   ├── macro.py
 │   ├── version.py
