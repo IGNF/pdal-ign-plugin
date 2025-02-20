@@ -1,14 +1,17 @@
 import argparse
 import tempfile
 
-from pdaltools.add_points_in_pointcloud import add_points_in_las
+from pdaltools.add_points_in_pointcloud import add_points_from_geojson_to_las
 
 from pdal_ign_macro import mark_points_to_use_for_digital_models_with_new_dimension
 
 
 def parse_args():
-    parser = argparse.ArgumentParser("TODO")
+    parser = argparse.ArgumentParser("Preprocessing MNX")
     parser.add_argument("--input_las", "-i", type=str, required=True, help="Input las file")
+    parser.add_argument(
+        "--input_geojson", "-ig", type=str, required=True, help="Input GeoJSON file"
+    )
     parser.add_argument(
         "--output_las", "-o", type=str, required=True, help="Output cloud las file"
     )
@@ -52,8 +55,15 @@ def parse_args():
     parser.add_argument(
         "--spatial_ref",
         type=str,
-        default="EPSG:2154",
-        help="spatial reference for the writer (required when running with a buffer)",
+        required=True,
+        help="spatial reference for the writer",
+    )
+    parser.add_argument(
+        "--virtual_points_classes",
+        "-c",
+        type=int,
+        default=66,
+        help="classification value to assign to the added virtual points",
     )
     parser.add_argument(
         "--tile_width",
@@ -70,11 +80,56 @@ def parse_args():
     parser.add_argument("ARGUMENTS ADD POINTS")
 
 
-def preprocess_mnx(input_las, output_las):
+def preprocess_mnx(
+    input_las: str,
+    input_geojson: str,
+    output_las: str,
+    dsm_dimension: str,
+    dtm_dimension: str,
+    output_dsm: str,
+    output_dtm: str,
+    keep_temporary_dims: bool,
+    skip_buffer: bool,
+    buffer_width: float,
+    spatial_ref: str,
+    virtual_points_classes: int,
+    tile_width: int,
+    tile_coord_scale: int,
+):
+    """Lauch preprocessing before calculating MNX
+    Args:
+        input_las (str): Path to the LIDAR `.las/.laz` file.
+        input_geosjon (str): Path to the input GeoJSON file with 3D points.
+        output_las (str): Path to save the updated LIDAR file (LAS/LAZ format).
+        dsm_dimension (str): Dimension name for the output DSM marker
+        dtm_dimension (str): Dimension name for the output DTM marker
+        output_dsm (str): utput dsm tiff file
+        output_dtm (str): utput dtm tiff file
+        keep_temporary_dims (bool): If set, do not delete temporary dimensions
+        skip_buffer (bool): If set, skip adding a buffer from the neighbor tiles based on their name
+        buffer_width (float): width of the border to add to the tile (in meters)
+        spatial_ref (str): CRS's value of the data in 'EPSG:XXXX' format
+        virtual_points_classes (int):  The classification value to assign to those virtual points (default: 66).
+        tile_width (int): Width of the tile in meters (default: 1000).
+        tile_coord_scale (int): scale used in the filename to describe coordinates in meters (default: 1000).
+    """
     with tempfile.NamedTemporaryFile(suffix="_intermediate.las", dir=".") as tmp_las:
-        add_points_in_las(input_las, tmp_las.name, "other args")
+        add_points_from_geojson_to_las(
+            input_geojson, tmp_las, output_las, virtual_points_classes, spatial_ref, tile_width
+        )
         mark_points_to_use_for_digital_models_with_new_dimension.main(
-            tmp_las.name, output_las, "other args"
+            tmp_las,
+            output_las,
+            dsm_dimension,
+            dtm_dimension,
+            output_dsm,
+            output_dtm,
+            keep_temporary_dims,
+            skip_buffer,
+            buffer_width,
+            spatial_ref,
+            tile_width,
+            tile_coord_scale,
         )
 
 

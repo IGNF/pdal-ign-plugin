@@ -4,6 +4,8 @@ channels:
   - anaconda
 dependencies:
   - pdal
+  - geopandas
+  - laspy
   - python-pdal
   - gdal
 # --------- dev dep --------- #
@@ -18,4 +20,4 @@ dependencies:
 # --------- pip & pip libraries --------- #
   - pip
   - pip:
-    - ign-pdal-tools==1.7.6
+    - ign-pdal-tools==1.7.7
