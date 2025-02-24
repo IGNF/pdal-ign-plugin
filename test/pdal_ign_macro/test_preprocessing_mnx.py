@@ -9,12 +9,12 @@ from pdal_ign_macro.main_preprocessing_mnx import preprocess_mnx
 
 def test_preprocess_mnx():
     # Test file paths
-    input_las = "test/data/4_6.las"
-    input_geojson = "test/data/points_3d/points_virtuels.geojson"
+    input_las = "test/data/test_semis_2023_0292_6833_LA93_IGN69.laz"
+    input_geojson = "test/data/points_3d/Points_virtuels_0292_6833.geojson"
     dsm_dimension = "dsm_marker"
     dtm_dimension = "dtm_marker"
 
-    with tempfile.NamedTemporaryFile(suffix="_preprocessed_output.las") as las_output:
+    with tempfile.NamedTemporaryFile(suffix="_preprocessed_output.laz") as las_output:
         # Execute the preprocessing function
         preprocess_mnx(
             input_las=input_las,
@@ -26,7 +26,7 @@ def test_preprocess_mnx():
             output_dtm="",
             keep_temporary_dims=True,
             skip_buffer=True,
-            buffer_width=25.0,
+            buffer_width=0,
             spatial_ref="EPSG:2154",
             virtual_points_classes=66,
             tile_width=1000,
@@ -63,8 +63,8 @@ def test_preprocess_mnx():
 
 def test_preprocess_mnx_with_output_files():
     # Test file paths
-    input_las = "test/data/4_6.las"
-    input_geojson = "test/data/points_3d/points_virtuels.geojson"
+    input_las = "test/data/test_semis_2023_0292_6833_LA93_IGN69.laz"
+    input_geojson = "test/data/points_3d/Points_virtuels_0292_6833.geojson"
     dsm_dimension = "dsm_marker"
     dtm_dimension = "dtm_marker"
 
@@ -84,7 +84,7 @@ def test_preprocess_mnx_with_output_files():
             output_dtm=output_dtm,
             keep_temporary_dims=True,
             skip_buffer=True,
-            buffer_width=25.0,
+            buffer_width=0,
             spatial_ref="EPSG:2154",
             virtual_points_classes=66,
             tile_width=1000,

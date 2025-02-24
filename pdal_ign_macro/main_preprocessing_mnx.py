@@ -10,7 +10,7 @@ def parse_args():
     parser = argparse.ArgumentParser("Preprocessing MNX")
     parser.add_argument("--input_las", "-i", type=str, required=True, help="Input las file")
     parser.add_argument(
-        "--input_geojson", "-ig", type=str, required=True, help="Input GeoJSON file"
+        "--input_geojson", "-ig", type=str, required=False, help="Input GeoJSON file"
     )
     parser.add_argument(
         "--output_las", "-o", type=str, required=True, help="Output cloud las file"
@@ -77,7 +77,6 @@ def parse_args():
         default=1000,
         help="scale used in the filename to describe coordinates in meters (required when running with a buffer)",
     )
-    parser.add_argument("ARGUMENTS ADD POINTS")
 
 
 def preprocess_mnx(
@@ -113,12 +112,12 @@ def preprocess_mnx(
         tile_width (int): Width of the tile in meters (default: 1000).
         tile_coord_scale (int): scale used in the filename to describe coordinates in meters (default: 1000).
     """
-    with tempfile.NamedTemporaryFile(suffix="_intermediate.las", dir=".") as tmp_las:
+    with tempfile.NamedTemporaryFile(suffix="_intermediate.laz", dir=".") as tmp_las:
         add_points_from_geojson_to_las(
-            input_geojson, tmp_las, output_las, virtual_points_classes, spatial_ref, tile_width
+            input_geojson, input_las, tmp_las.name, virtual_points_classes, spatial_ref, tile_width
         )
         mark_points_to_use_for_digital_models_with_new_dimension.main(
-            tmp_las,
+            tmp_las.name,
             output_las,
             dsm_dimension,
             dtm_dimension,
