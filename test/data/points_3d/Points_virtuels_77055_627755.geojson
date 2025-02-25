@@ -1,0 +1,10 @@
+{
+    "type": "FeatureCollection",
+    "name": "Points_virtuels_clip",
+    "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::2154" } },
+    "features": [
+    { "type": "Feature", "properties": { "ID_seg": 1, "RecupZ": 20.78, "vertex_index": 0, "vertex_part": 0, "vertex_part_index": 0, "distance": 0.0, "angle": 343.0 }, "geometry": { "type": "Point", "coordinates": [ 770025.5, 6277955.5 ] } },
+    { "type": "Feature", "properties": { "ID_seg": 2, "RecupZ": 20.8, "vertex_index": 0, "vertex_part": 0, "vertex_part_index": 0, "distance": 0.2, "angle": 343.99 }, "geometry": { "type": "Point", "coordinates": [ 770035.5, 6277958.5 ] } },
+    { "type": "Feature", "properties": { "ID_seg": 3, "RecupZ": 20.8, "vertex_index": 0, "vertex_part": 0, "vertex_part_index": 0, "distance": 0.12, "angle": 343.95 }, "geometry": { "type": "Point", "coordinates": [ 770045.5, 6277959.5 ] } }
+    ]
+    }
