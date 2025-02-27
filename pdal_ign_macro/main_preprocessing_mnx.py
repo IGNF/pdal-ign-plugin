@@ -1,13 +1,13 @@
 import argparse
-import os
 import tempfile
+from pathlib import Path
 
 from pdaltools.add_points_in_pointcloud import add_points_from_geojson_to_las
 
 from pdal_ign_macro import mark_points_to_use_for_digital_models_with_new_dimension
 
 
-def parse_args(argv=None):
+def parse_args():
     parser = argparse.ArgumentParser("Preprocessing MNX")
     parser.add_argument("--input_las", "-i", type=str, required=True, help="Input las file")
     parser.add_argument(
@@ -78,16 +78,8 @@ def parse_args(argv=None):
         default=1000,
         help="scale used in the filename to describe coordinates in meters (required when running with a buffer)",
     )
-    parser.add_argument(
-        "--add_points", action="store_true", help="Only run add_points_from_geojson_to_las"
-    )
-    parser.add_argument(
-        "--mark_points",
-        action="store_true",
-        help="Only run mark_points_to_use_for_digital_models_with_new_dimension",
-    )
 
-    return parser.parse_args(argv)
+    return parser.parse_args()
 
 
 def preprocess_mnx(
@@ -105,18 +97,16 @@ def preprocess_mnx(
     virtual_points_classes: int,
     tile_width: int,
     tile_coord_scale: int,
-    add_points: bool,
-    mark_points: bool,
 ):
-    """Lauch preprocessing before calculating MNX
+    """Launch preprocessing before calculating MNX
     Args:
         input_las (str): Path to the LIDAR `.las/.laz` file.
-        input_geosjon (str): Path to the input GeoJSON file with 3D points.
+        input_geojson (str): Path to the input GeoJSON file with 3D points (if None or "", only points marking is enabled)
         output_las (str): Path to save the updated LIDAR file (LAS/LAZ format).
         dsm_dimension (str): Dimension name for the output DSM marker
         dtm_dimension (str): Dimension name for the output DTM marker
-        output_dsm (str): utput dsm tiff file
-        output_dtm (str): utput dtm tiff file
+        output_dsm (str): output dsm tiff file
+        output_dtm (str): output dtm tiff file
         keep_temporary_dims (bool): If set, do not delete temporary dimensions
         skip_buffer (bool): If set, skip adding a buffer from the neighbor tiles based on their name
         buffer_width (float): width of the border to add to the tile (in meters)
@@ -124,63 +114,42 @@ def preprocess_mnx(
         virtual_points_classes (int):  The classification value to assign to those virtual points (default: 66).
         tile_width (int): Width of the tile in meters (default: 1000).
         tile_coord_scale (int): scale used in the filename to describe coordinates in meters (default: 1000).
-        add_points (bool): If set, only run add_points_from_geojson_to_las.
-        mark_points (bool): If set, only run mark_points_to_use_for_digital_models_with_new_dimension.
     """
 
     # If no GeoJSON input is provided, we cannot add or mark points
-    if not input_geojson:
-        print("No GeoJSON input provided. Skipping preprocessing.")
-        return
 
-    # Step 1: Define the intermediate LAS file path
-    if mark_points:
-        # Extract coordinates from input filename (assuming standard format)
-        basename = os.path.basename(input_las)
-        parts = basename.split("_")
-        if len(parts) >= 5:
-            prefix1, prefix2, coordx, coordy, suffix = parts[:5]  # Extract relevant parts
+    with tempfile.NamedTemporaryFile(
+        prefix=Path(input_las).stem, suffix="_intermediate.laz", dir="."
+    ) as tmp_las:
+
+        if input_geojson:
+            mark_points_input_path = tmp_las.name
+
+            add_points_from_geojson_to_las(
+                input_geojson,
+                input_las,
+                mark_points_input_path,
+                virtual_points_classes,
+                spatial_ref,
+                tile_width,
+            )
         else:
-            raise ValueError(f"Invalid input LAS filename format: {basename}")
-        # Construct the expected intermediate LAS filename
-        expected_filename = f"{prefix1}_{prefix2}_{coordx}_{coordy}_intermediate.las"
+            print("No GeoJSON input provided. Skip adding points.")
+            mark_points_input_path = input_las
 
-        # Create a temporary file for intermediate processing
-        with tempfile.NamedTemporaryFile(suffix="intermediate.las", dir=".") as tmp_las:
-            intermediate_directory = os.path.dirname(tmp_las.name)
-            # Rename the temporary file to match the expected format
-            intermediate_filename = expected_filename
-            intermediate_las = os.path.join(intermediate_directory, intermediate_filename)
-    else:
-        # If no marking is needed, use the final output as the intermediate file
-        intermediate_las = output_las
-
-    # Step 2: Add points from GeoJSON to LAS (if required)
-    if add_points:
-        add_points_from_geojson_to_las(
-            input_geojson,
-            input_las,
-            intermediate_las,
-            virtual_points_classes,
-            spatial_ref,
-            tile_width,
-        )
-
-    # Step 3: Mark points for digital models (if required)
-    if mark_points:
         mark_points_to_use_for_digital_models_with_new_dimension.main(
-            intermediate_las,
+            mark_points_input_path,
             output_las,
             dsm_dimension,
             dtm_dimension,
             output_dsm,
             output_dtm,
             keep_temporary_dims,
-            skip_buffer,
-            buffer_width,
-            spatial_ref,
-            tile_width,
-            tile_coord_scale,
+            skip_buffer=skip_buffer,
+            buffer_width=buffer_width,
+            spatial_ref=spatial_ref,
+            tile_width=tile_width,
+            tile_coord_scale=tile_coord_scale,
         )
 
 

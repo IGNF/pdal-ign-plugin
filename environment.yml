@@ -3,10 +3,10 @@ channels:
   - conda-forge
   - anaconda
 dependencies:
-  - pdal
-  - geopandas
-  - laspy
-  - python-pdal
+  - python=3.12.*
+  - numpy
+  - conda-forge:pdal==2.8.*
+  - conda-forge:python-pdal>=3.4
   - gdal
 # --------- dev dep --------- #
   - cmake
@@ -20,4 +20,6 @@ dependencies:
 # --------- pip & pip libraries --------- #
   - pip
   - pip:
-    - ign-pdal-tools==1.7.7
+    # Install laspy with laszip laz compression (as laszip is an implementation of the laz 1.4 standard)
+    - laspy[laszip]  # Installed via pip because laszip is not handled by the conda package.
+    - ign-pdal-tools==1.7.8
