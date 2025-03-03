@@ -20,14 +20,29 @@ jobs:
     - name: install cppunit
       run: sudo apt install -y libcppunit-dev
 
-    - uses: conda-incubator/setup-miniconda@v3
+
+    # See https://github.com/marketplace/actions/setup-micromamba
+    - name: setup-micromamba
+      uses: mamba-org/setup-micromamba@v2.0.4
       with:
-        activate-environment: pdal_ign_plugin
-        environment-file: ./environment.yml
-        auto-activate-base: true
+        environment-file: environment.yml
+        environment-name: pdal_ign_plugin  # activate the environment
+        cache-environment: false
+        cache-downloads: true
+        generate-run-shell: true
 
     - name: compile_plugins
-      run: source ./ci/build.sh
+      shell: micromamba-shell {0}
+      run: |
+       mkdir -p build
+       cd build
+       cmake -G"Unix Makefiles" -DCONDA_PREFIX=$MAMBA_ROOT_PREFIX -DCMAKE_BUILD_TYPE=Release ../
+       make install
 
-    - name: test
-      run: source ./ci/launch_test.sh
+
+    - name: run tests
+      shell: micromamba-shell {0}
+      run: |
+        export PDAL_DRIVER_PATH=./install/lib
+        echo $PDAL_DRIVER_PATH
+        python -m pytest -s
