@@ -1,3 +1,4 @@
+- Add preprocessing_mnx script, that adds points from a geojson + mark points for dsm/dtm
 - Add example to run a local python script in the pdal_ign_plugin docker image
 
 ### 0.3.1
