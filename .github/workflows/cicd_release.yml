@@ -37,7 +37,7 @@ jobs:
         with:
           environment-file: environment.yml
           environment-name: pdal_ign_plugin  # activate the environment
-          cache-environment: true
+          cache-environment: false
           cache-downloads: true
           generate-run-shell: true
 
