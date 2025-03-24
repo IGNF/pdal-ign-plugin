@@ -6,7 +6,7 @@ set(CMAKE_PREFIX_PATH ${CONDA_PREFIX})
 set(CMAKE_XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS "-o linker-signed")
 
 find_package(PDAL REQUIRED)
-find_package(gdal REQUIRED)
+find_package(GDAL REQUIRED)
 
 set(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR}/install)
 set(CMAKE_DEBUG_POSTFIX d)
