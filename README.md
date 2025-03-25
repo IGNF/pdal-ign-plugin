@@ -60,6 +60,8 @@ python -m pytest -s
 
 [radius assign](./doc/radius_assign.md)
 
+[classify by geo](./doc/classify_by_geo.md)
+
 ## Adding a filter
 
 In order to add a filter, you have to add a new folder in the src directory :
