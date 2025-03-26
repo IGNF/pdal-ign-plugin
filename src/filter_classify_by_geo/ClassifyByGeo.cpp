@@ -23,7 +23,7 @@ CREATE_STATIC_STAGE(ClassifyByGeoFilter, s_info)
 
 void ClassifyByGeoFilter::addArgs(ProgramArgs& args)
 {
-    args.add("new_class_value", "Dimension on which to filter", new_class_value).setPositional();
+    args.add("new_class_value", "New classification value", new_class_value).setPositional();
     args.add("datasource", "OGR-readable datasource for Polygon or Multipolygon data", m_datasource).setPositional();
 }
 

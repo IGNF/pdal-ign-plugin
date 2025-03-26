@@ -72,6 +72,27 @@ def classify_hgt_ground(pipeline, h_min, h_max, condition, condition_out):
     return pipeline
 
 
+def classify_hgt_ground_list(pipeline, class_ground, h_min, h_max, condition, condition_out):
+    """
+    reassign points from "condition" between "h_min" and "h_max" of the ground to "condition_out"
+    This combination is equivalent to the FnScanClassifyHgtLst macro of TerraScan
+    class_ground : list of classified points consider as ground
+    condition, condition_out : a pdal condition as "Classification==2"
+    """
+    pipeline |= pdal.Filter.ferry(dimensions="=>PT_GROUND_TMP")
+    condition_class_ground = build_condition("Classification", class_ground)
+    pipeline |= pdal.Filter.assign(
+        value=[
+            "PT_GROUND_TMP = 0",
+            f"PT_GROUND_TMP = CLASSIFICATION WHERE {condition_class_ground}",
+        ]
+    )
+    pipeline |= pdal.Filter.assign(value="CLASSIFICATION=2 where PT_GROUND_TMP!=0")
+    classify_hgt_ground(pipeline, h_min, h_max, condition, condition_out)
+    pipeline |= pdal.Filter.assign(value="CLASSIFICATION=PT_GROUND_TMP where PT_GROUND_TMP!=0")
+    return pipeline
+
+
 def keep_non_planar_pts(pipeline, condition, condition_out):
     """
     reassign points from "condition" who are planar to "condition_out"

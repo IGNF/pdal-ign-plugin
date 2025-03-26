@@ -8,7 +8,7 @@ The **classify by geo filter** apply a classification values for points who are 
 Example
 ---------------------------------------------------------------------------------------------------------
 
-This pipeline updates the Keypoint dimension of all points with classification 1 to 2 (unclassified and ground) that are closer than 1 meter from a point with classification 6 (building)
+This pipeline updates the classification to 66 of all points who are included inside the geometry included in the file_geo.geojson
 
 
 ```

@@ -62,6 +62,9 @@ python -m pytest -s
 
 [classify by geo](./doc/classify_by_geo.md)
 
+[classify by distance](./doc/classify_by_distance.md)
+
+
 ## Adding a filter
 
 In order to add a filter, you have to add a new folder in the src directory :
