@@ -16,7 +16,7 @@ def test_classify_hgt_ground():
 
         pipeline = pdal.Pipeline() | pdal.Reader.las(input_las)
         macro.classify_hgt_ground(
-            pipeline, Hmin, Hmax, condition="Classification==1", condition_out="Classification=3"
+            pipeline, Hmin, Hmax, condition="Classification==1", assignment_out="Classification=3"
         )
         pipeline |= pdal.Writer.las(
             extra_dims="all", forward="all", filename=output_las.name, minor_version="4"
@@ -45,8 +45,6 @@ def test_classify_hgt_ground_list():
 
     with tempfile.NamedTemporaryFile(suffix="_out.las") as output_las:
 
-        output_las = "test/data/4_6_out.las"
-
         pipeline = pdal.Pipeline() | pdal.Reader.las(input_las)
         macro.classify_hgt_ground_list(
             pipeline,
@@ -54,10 +52,41 @@ def test_classify_hgt_ground_list():
             Hmin,
             Hmax,
             condition="Classification==1",
-            condition_out="Classification=4",
+            assignment_out="Classification=4",
         )
         pipeline |= pdal.Writer.las(
-            extra_dims="all", forward="all", filename=output_las, minor_version="4"
+            extra_dims="all", forward="all", filename=output_las.name, minor_version="4"
+        )
+
+        pipeline.execute()
+        arrays = pipeline.arrays
+        array = arrays[0]
+
+        nb_pts_inside = 0
+        for pt in array:
+            if pt["Classification"] == 4:
+                nb_pts_inside += 1
+                assert pt["Z"] < Zmax_2_3 + Hmax
+
+        assert nb_pts_inside > 0
+
+
+def test_classify_thin_grid_2d():
+
+    input_las = "test/data/4_6.las"
+    grid_size = 5
+
+    with tempfile.NamedTemporaryFile(suffix="_out.las") as output_las:
+
+        pipeline = pdal.Pipeline() | pdal.Reader.las(input_las)
+        macro.classify_thin_grid_2d(
+            pipeline,
+            condition="Classification==1",
+            assignment_out="Classification=3",
+            grid_size=grid_size,
+        )
+        pipeline |= pdal.Writer.las(
+            extra_dims="all", forward="all", filename=output_las.name, minor_version="4"
         )
 
         pipeline.execute()
@@ -68,6 +97,5 @@ def test_classify_hgt_ground_list():
         for pt in array:
             if pt["Classification"] == 3:
                 nb_pts_inside += 1
-                assert pt["Z"] < Zmax_2_3 + Hmax
 
         assert nb_pts_inside > 0

@@ -28,7 +28,7 @@ def add_radius_assign(
         condition_src (str): pdal condition for points to apply the modification to (eg. "Classification==2")
         condition_ref (str): pdal condition for the potential neighbors to search for (eg. "Classification==4")
         condition_out (str): pdal condition to apply to the points that belong to "condition_src" and
-            have a point from "condition_ref" closer than "radius" (eg. "Classification==2")
+            have a point from "condition_ref" closer than "radius" (eg. "Classification=2")
         max2d_above (float, optional): In case of 2d Search, upward limit for potential neighbors. Defaults to -1.
         max2d_below (float, optional):  In case of 2d Search, downward limit for potential neighbors. Defaults to -1.
 
@@ -59,25 +59,27 @@ def add_radius_assign(
     return pipeline
 
 
-def classify_hgt_ground(pipeline, h_min, h_max, condition, condition_out):
+def classify_hgt_ground(pipeline, h_min, h_max, condition, assignment_out):
     """
     reassign points from "condition" between "h_min" and "h_max" of the ground to "condition_out"
     This combination is equivalent to the ClassifyHgtGrd macro of TerraScan
-    condition, condition_out : a pdal condition as "Classification==2"
+    condition : a pdal condition as "Classification==2"
+    condition_out : a pdal assignment as "Classification=2"
     """
     pipeline |= pdal.Filter.hag_delaunay(allow_extrapolation=True)
     condition_h = f"HeightAboveGround>{h_min} && HeightAboveGround<={h_max}"
     condition_h += " && " + condition
-    pipeline |= pdal.Filter.assign(value=condition_out, where=condition_h)
+    pipeline |= pdal.Filter.assign(value=assignment_out, where=condition_h)
     return pipeline
 
 
-def classify_hgt_ground_list(pipeline, class_ground, h_min, h_max, condition, condition_out):
+def classify_hgt_ground_list(pipeline, class_ground, h_min, h_max, condition, assignment_out):
     """
     reassign points from "condition" between "h_min" and "h_max" of the ground to "condition_out"
     This combination is equivalent to the FnScanClassifyHgtLst macro of TerraScan
     class_ground : list of classified points consider as ground
-    condition, condition_out : a pdal condition as "Classification==2"
+    condition : a pdal condition as "Classification==2"
+    condition_out : a pdal assignment as "Classification=2"
     """
     pipeline |= pdal.Filter.ferry(dimensions="=>PT_GROUND_TMP")
     condition_class_ground = build_condition("Classification", class_ground)
@@ -88,20 +90,38 @@ def classify_hgt_ground_list(pipeline, class_ground, h_min, h_max, condition, co
         ]
     )
     pipeline |= pdal.Filter.assign(value="CLASSIFICATION=2 where PT_GROUND_TMP!=0")
-    classify_hgt_ground(pipeline, h_min, h_max, condition, condition_out)
+    classify_hgt_ground(pipeline, h_min, h_max, condition, assignment_out)
     pipeline |= pdal.Filter.assign(value="CLASSIFICATION=PT_GROUND_TMP where PT_GROUND_TMP!=0")
     return pipeline
 
 
-def keep_non_planar_pts(pipeline, condition, condition_out):
+def keep_non_planar_pts(pipeline, condition, assignment_out):
     """
     reassign points from "condition" who are planar to "condition_out"
     This combination is equivalent to the ClassifyModelKey macro of TerraScan
-    condition, condition_out : a pdal condition as "Classification==2"
+    condition : a pdal condition as "Classification==2"
+    condition_out : a pdal assignment as "Classification=2"
     """
     pipeline |= pdal.Filter.approximatecoplanar(knn=8, thresh1=25, thresh2=6, where=condition)
-    pipeline |= pdal.Filter.assign(value=condition_out, where=f"Coplanar==0 && ({condition})")
+    pipeline |= pdal.Filter.assign(value=assignment_out, where=f"Coplanar==0 && ({condition})")
     return pipeline
+
+
+def classify_thin_grid_2d(pipeline, condition, assignment_out, grid_size):
+    """
+    get the highest point from "condition" on cells and reassign o "assignment_out"
+    This combination is equivalent to the FnScanThinGrid2d macro of TerraScan
+    condition : a pdal condition as "Classification==2"
+    condition_out : a pdal assignment as "Classification=2"
+    """
+    pipeline |= pdal.Filter.ferry(dimensions="=>PT_GRID_HGT_TMP")
+    pipeline |= pdal.Filter.grid_decimation_deprecated(
+        resolution=grid_size,
+        output_dimension="PT_GRID_HGT_TMP",
+        output_type="max",
+        where=condition,
+    )
+    pipeline |= pdal.Filter.assign(value=assignment_out, where="PT_GRID_HGT_TMP==1")
 
 
 def build_condition(key, values):
