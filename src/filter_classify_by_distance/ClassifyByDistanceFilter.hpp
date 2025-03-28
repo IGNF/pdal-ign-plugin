@@ -26,7 +26,7 @@ private:
         int new_class_value;
         double distance_min;
         double distance_max;
-        bool only_bellow;
+        bool only_above;
     };
     std::unique_ptr<ClassifyByDistanceArgs> m_args;
     PointViewPtr refView;

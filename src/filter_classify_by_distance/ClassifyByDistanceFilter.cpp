@@ -37,7 +37,7 @@ void ClassifyByDistanceFilter::addArgs(ProgramArgs& args)
     args.add("distance_min", "distance max for new classification", m_args->distance_min, 0.);
     args.add("distance_max", "distance max for new classification", m_args->distance_max, 0.);
     args.add("new_class_value", "New classification value", m_args->new_class_value, 100);
-    args.add("only_bellow", "Only points bellow", m_args->only_above, false);
+    args.add("only_bellow", "Only points above", m_args->only_above, false);
 }
 
 void ClassifyByDistanceFilter::filter(PointView& view)
@@ -72,7 +72,7 @@ void ClassifyByDistanceFilter::filter(PointView& view)
         double val = std::sqrt(sqr_dists[k - 1]);
         if (val > m_args->distance_min && val < m_args->distance_max)
         {
-            if (m_args->only_bellow){
+            if (m_args->only_above){
                 double z_nei = refView->getFieldAs<double>(Dimension::Id::Z, indices[0]);
                 if ( z_nei < z ) continue;
             }

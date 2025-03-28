@@ -114,6 +114,16 @@ if __name__ == "__main__":
         value="Classification=5", where=macro.build_condition("Classification", [100, 101, 102])
     )
 
+    # FnScanDistClass("5", "2")
+    # FnScanClassifyHgtGrd(2, 100.0, 5, 3, 0.000, 0.500, 0)
+    # FnScanClassifyHgtGrd(2, 100.0, 5, 4, 0.500, 1.500, 0)
+    macro.classify_hgt_ground(
+        pipeline, 0.0, 0.5, condition="Classification==5", assignment_out="Classification=3"
+    )
+    macro.classify_hgt_ground(
+        pipeline, 0.5, 1.5, condition="Classification==5", assignment_out="Classification=4"
+    )
+
     pipeline |= pdal.Writer.las(extra_dims="all", forward="all", filename=args.output_las)
 
     # export des DSM/DTM
