@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <ogr_api.h>
+#include <ogr_geometry.h>
 
 #include <pdal/Polygon.hpp>
 #include <pdal/util/ProgramArgs.hpp>
@@ -25,6 +26,8 @@ void ClassifyByGeoFilter::addArgs(ProgramArgs& args)
 {
     args.add("new_class_value", "New classification value", new_class_value).setPositional();
     args.add("datasource", "OGR-readable datasource for Polygon or Multipolygon data", m_datasource).setPositional();
+    args.add("src_domain", "Selects which points will be subject to be classify", class_to_treath, std::vector<int32_t>());
+    args.add("buffer", "Buffer around polygons", buffer, 0.);
 }
 
 void ClassifyByGeoFilter::initialize()
@@ -52,6 +55,13 @@ void ClassifyByGeoFilter::ready(PointTableRef table)
     {
         OGRGeometryH geom = OGR_F_GetGeometryRef(feature.get());
 
+        if (buffer>0) 
+        {
+            OGRGeometry * geomb = gdal::fromHandle(geom);
+            geomb = geomb->Buffer(buffer);
+            geom = gdal::toHandle(geomb);
+        }
+                    
         m_polygons.push_back(
             { Polygon(geom), new_class_value} );
 
@@ -86,6 +96,13 @@ PointViewSet ClassifyByGeoFilter::run(PointViewPtr view)
     for (PointId id = 0; id < view->size(); ++id)
     {
         PointRef point = view->point(id);
+        
+        if (!class_to_treath.empty())
+        {
+            uint8_t classif = view->getFieldAs<uint8_t>(Dimension::Id::Classification, id);
+            if ( std::find (class_to_treath.begin(), class_to_treath.end(), classif ) == class_to_treath.end()) continue;
+        }
+        
         processOne(point);
     }
     

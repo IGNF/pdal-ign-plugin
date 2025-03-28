@@ -107,18 +107,19 @@ def keep_non_planar_pts(pipeline, condition, assignment_out):
     return pipeline
 
 
-def classify_thin_grid_2d(pipeline, condition, assignment_out, grid_size):
+def classify_thin_grid_2d(pipeline, condition, assignment_out, grid_size, mode):
     """
     get the highest point from "condition" on cells and reassign o "assignment_out"
     This combination is equivalent to the FnScanThinGrid2d macro of TerraScan
     condition : a pdal condition as "Classification==2"
     condition_out : a pdal assignment as "Classification=2"
+    mode : 'min' or 'max'
     """
     pipeline |= pdal.Filter.ferry(dimensions="=>PT_GRID_HGT_TMP")
     pipeline |= pdal.Filter.grid_decimation_deprecated(
         resolution=grid_size,
         output_dimension="PT_GRID_HGT_TMP",
-        output_type="max",
+        output_type=mode,
         where=condition,
     )
     pipeline |= pdal.Filter.assign(value=assignment_out, where="PT_GRID_HGT_TMP==1")

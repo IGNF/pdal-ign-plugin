@@ -24,14 +24,15 @@ private:
         int m_referenceDomain;
         int m_srcDomain;
         int new_class_value;
-        double distance;
+        double distance_min;
+        double distance_max;
+        bool only_bellow;
     };
     std::unique_ptr<ClassifyByDistanceArgs> m_args;
     PointViewPtr refView;
     
     virtual void addArgs(ProgramArgs& args);
     virtual void filter(PointView& view);
-    virtual void initialize();
     
     size_t m_k;
 };

@@ -55,7 +55,9 @@ private:
 
     std::string m_datasource;
     int32_t new_class_value;
+    std::vector<int32_t> class_to_treath;
     std::vector<PolyVal> m_polygons;
+    double buffer;
 
 
 };

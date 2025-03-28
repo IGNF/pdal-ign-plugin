@@ -84,6 +84,7 @@ def test_classify_thin_grid_2d():
             condition="Classification==1",
             assignment_out="Classification=3",
             grid_size=grid_size,
+            mode="max",
         )
         pipeline |= pdal.Writer.las(
             extra_dims="all", forward="all", filename=output_las.name, minor_version="4"

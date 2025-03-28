@@ -34,14 +34,10 @@ void ClassifyByDistanceFilter::addArgs(ProgramArgs& args)
 {
     args.add("src_domain", "Classification of points which will be subject to new classification", m_args->m_srcDomain, 0);
     args.add("reference_domain", "Classification of points which will be considered for the distance search", m_args->m_referenceDomain, 1);
-    args.add("distance", "distance max for new classification", m_args->distance, 0.);
+    args.add("distance_min", "distance max for new classification", m_args->distance_min, 0.);
+    args.add("distance_max", "distance max for new classification", m_args->distance_max, 0.);
     args.add("new_class_value", "New classification value", m_args->new_class_value, 100);
-}
-
-void ClassifyByDistanceFilter::initialize()
-{
-    if (m_args->distance <= 0)
-        throwError("Invalid 'distance' option: " + std::to_string(m_args->distance) + ", must be > 0");
+    args.add("only_bellow", "Only points bellow", m_args->only_above, false);
 }
 
 void ClassifyByDistanceFilter::filter(PointView& view)
@@ -59,7 +55,7 @@ void ClassifyByDistanceFilter::filter(PointView& view)
     if (!refView->size()) return;
     KD3Index& index = refView->build3dIndex();
     
-    size_t k = 1;  // only one point
+    size_t k = 1;  // only one point - the closest
     for (PointId idx = 0; idx < view.size(); ++idx)
     {
         uint8_t classif = view.getFieldAs<uint8_t>(Dimension::Id::Classification, idx);
@@ -74,8 +70,15 @@ void ClassifyByDistanceFilter::filter(PointView& view)
         index.knnSearch(x, y, z, k, &indices, &sqr_dists);
 
         double val = std::sqrt(sqr_dists[k - 1]);
-        if (val < m_args->distance)
+        if (val > m_args->distance_min && val < m_args->distance_max)
+        {
+            if (m_args->only_bellow){
+                double z_nei = refView->getFieldAs<double>(Dimension::Id::Z, indices[0]);
+                if ( z_nei < z ) continue;
+            }
+            
             view.setField(Dimension::Id::Classification, idx, m_args->new_class_value);
+        }
     }
 }
 
