@@ -1,3 +1,5 @@
+### 0.4.1
+
 - In preprocessing_mnx, add ability to add virtual points from lines geometry file (ign-pdal-tools 1.8.1)
 
 ## 0.4.0
