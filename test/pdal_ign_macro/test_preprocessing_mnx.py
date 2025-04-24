@@ -8,18 +8,22 @@ from pdal_ign_macro.main_preprocessing_mnx import preprocess_mnx
 
 
 @pytest.mark.parametrize(
-    "ini_las, ini_geojson, skip_buffer, nb_points_added",
+    "ini_las, ini_geojson, spacing, altitude_column, skip_buffer, nb_points_added",
     [
         (
             # File that does not have points with class 66 yet
             "test/data/buffer/test_data_77055_627760_LA93_IGN69.laz",
             "test/data/points_3d/Points_virtuels_77055_627760.geojson",
+            0,
+            "RecupZ",
             False,
             3,
         ),
         (
             "test/data/buffer/test_data_77055_627760_LA93_IGN69.laz",
             "",  # No geojson
+            0,
+            "",
             False,
             0,
         ),
@@ -27,26 +31,52 @@ from pdal_ign_macro.main_preprocessing_mnx import preprocess_mnx
             # Geojson that don't have points inside the las tile area
             "test/data/buffer/test_data_77055_627755_LA93_IGN69.laz",
             "test/data/points_3d/Points_virtuels_77055_627760.geojson",
+            0,
+            "RecupZ",
             False,
             0,
         ),
         (
             # Filename that does not contain coordinates should work if skip_buffer=True
             "test/data/mnx/input/crop_1.laz",
-            "",  # No geojson
+            "test/data/points_3d/points_virtuels.geojson",
+            0,
+            "RecupZ",
             True,
             0,
         ),
+        (
+            # input geometry with 2d lines
+            "test/data/buffer/test_data_77055_627760_LA93_IGN69.laz",
+            "test/data/lines_3d/Points_virtuels_lines_2d_77055_627760.geojson",
+            1,
+            "RecupZ",
+            False,
+            53,
+        ),
+        (
+            # input geometry with 3d lines
+            "test/data/buffer/test_data_77055_627760_LA93_IGN69.laz",
+            "test/data/lines_3d/Points_virtuels_lines_3d_77055_627760.geojson",
+            1,
+            "",
+            False,
+            53,
+        ),
     ],
 )
-def test_preprocess_mnx(ini_las, ini_geojson, skip_buffer, nb_points_added):
+def test_preprocess_mnx(
+    ini_las, ini_geojson, spacing, altitude_column, skip_buffer, nb_points_added
+):
     dsm_dimension = "dsm_marker"
     dtm_dimension = "dtm_marker"
 
     with tempfile.NamedTemporaryFile(suffix="_preprocessed_output.laz") as las_output:
         preprocess_mnx(
             input_las=ini_las,
-            input_geojson=ini_geojson,
+            input_geometry=ini_geojson,
+            spacing=spacing,
+            altitude_column=altitude_column,
             output_las=las_output.name,
             dsm_dimension=dsm_dimension,
             dtm_dimension=dtm_dimension,
@@ -77,28 +107,39 @@ def test_preprocess_mnx(ini_las, ini_geojson, skip_buffer, nb_points_added):
         assert dtm_dimension in output_dimensions, "DTM marker dimension not found"
         assert np.any(arr[dsm_dimension] == 1), "No points marked for DSM"
         assert np.any(arr[dtm_dimension] == 1), "No points marked for DTM"
+        assert not np.all(arr["Intensity"] == 0), "Lost Intensity value"
 
 
 @pytest.mark.parametrize(
-    "ini_las, ini_geojson, skip_buffer",
+    "ini_las, ini_geojson, skip_buffer, error_type",
     [
         (
             # Filename that does not contain coordinates should work if skip_buffer=True
             "test/data/mnx/input/crop_1.laz",
             "",  # No geojson
             False,
+            ValueError,
+        ),
+        (
+            # Geojson file is 2d lines, but no altitude_column is provided
+            "test/data/buffer/test_data_77055_627760_LA93_IGN69.laz",
+            "test/data/lines_3d/Points_virtuels_lines_2d_77055_627760.geojson",
+            True,
+            NotImplementedError,
         ),
     ],
 )
-def test_preprocess_mnx_fail(ini_las, ini_geojson, skip_buffer):
+def test_preprocess_mnx_fail(ini_las, ini_geojson, skip_buffer, error_type):
     dsm_dimension = "dsm_marker"
     dtm_dimension = "dtm_marker"
 
-    with pytest.raises(ValueError):
+    with pytest.raises(error_type):
         with tempfile.NamedTemporaryFile(suffix="_preprocessed_output.laz") as las_output:
             preprocess_mnx(
                 input_las=ini_las,
-                input_geojson=ini_geojson,
+                input_geometry=ini_geojson,
+                spacing=0,
+                altitude_column="",
                 output_las=las_output.name,
                 dsm_dimension=dsm_dimension,
                 dtm_dimension=dtm_dimension,

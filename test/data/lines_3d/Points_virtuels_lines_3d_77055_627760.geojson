@@ -1,0 +1,10 @@
+{
+    "type": "FeatureCollection",
+    "name": "Virtual points matching tile test_data_77055_627760_LA93_IGN69.laz ",
+    "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::2154" } },
+    "features": [
+    { "type": "Feature", "properties": { "ID_seg": 1 }, "geometry": { "type": "LineString", "coordinates": [[ 770560, 6277590, 22 ], [ 770560, 6277560, 22 ]] } },
+    { "type": "Feature", "properties": { "ID_seg": 2 }, "geometry": { "type": "LineString", "coordinates": [[ 770570, 6277580, 25 ], [ 770570, 6277570, 25 ]] } },
+    { "type": "Feature", "properties": { "ID_seg": 3 }, "geometry": { "type": "LineString", "coordinates": [[ 770580, 6277570, 30 ], [ 770590, 6277570, 30 ]]} }
+    ]
+    }
