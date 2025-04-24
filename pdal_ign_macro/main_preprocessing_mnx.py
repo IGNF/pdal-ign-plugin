@@ -2,20 +2,49 @@ import argparse
 import tempfile
 from pathlib import Path
 
-from pdaltools.add_points_in_pointcloud import add_points_from_geojson_to_las
+from pdaltools.add_points_in_pointcloud import add_points_from_geometry_to_las
 
 from pdal_ign_macro import mark_points_to_use_for_digital_models_with_new_dimension
 
 
 def parse_args():
-    parser = argparse.ArgumentParser("Preprocessing MNX")
-    parser.add_argument("--input_las", "-i", type=str, required=True, help="Input las file")
-    parser.add_argument(
-        "--input_geojson", "-ig", type=str, required=False, help="Input GeoJSON file"
+    parser = argparse.ArgumentParser(
+        "Preprocessing MNX: add virtual points and mark points to use for DTM/DSM"
     )
+    parser.add_argument("--input_las", "-i", type=str, required=True, help="Input las file")
     parser.add_argument(
         "--output_las", "-o", type=str, required=True, help="Output cloud las file"
     )
+    # Arguments related to adding virtual points
+    parser.add_argument(
+        "--input_geometry",
+        "-ig",
+        type=str,
+        required=False,
+        help="Input GeoJSON/shp file containing lines or points",
+    )
+    parser.add_argument(
+        "--virtual_points_classes",
+        "-c",
+        type=int,
+        default=66,
+        help="classification value to assign to the added virtual points",
+    )
+    parser.add_argument(
+        "--spacing",
+        type=float,
+        default=0.25,
+        help="spacing between generated points in meters (if geojson contains lines) (default. 25 cm)",
+    )
+    parser.add_argument(
+        "--altitude_column",
+        "-z",
+        type=str,
+        required=False,
+        default=None,
+        help="altitude column name from input geometry (use point.z if altitude_column is not set)",
+    )
+    # Arguments elated to marking points
     parser.add_argument(
         "--dsm_dimension",
         type=str,
@@ -42,6 +71,7 @@ def parse_args():
         action="store_true",
         help="If set, do not delete temporary dimensions",
     )
+    # Arguments related to pointcloud geometry
     parser.add_argument(
         "--skip_buffer",
         action="store_true",
@@ -58,13 +88,6 @@ def parse_args():
         type=str,
         required=True,
         help="spatial reference for the writer",
-    )
-    parser.add_argument(
-        "--virtual_points_classes",
-        "-c",
-        type=int,
-        default=66,
-        help="classification value to assign to the added virtual points",
     )
     parser.add_argument(
         "--tile_width",
@@ -84,7 +107,9 @@ def parse_args():
 
 def preprocess_mnx(
     input_las: str,
-    input_geojson: str,
+    input_geometry: str,
+    spacing: float,
+    altitude_column: str,
     output_las: str,
     dsm_dimension: str,
     dtm_dimension: str,
@@ -101,7 +126,9 @@ def preprocess_mnx(
     """Launch preprocessing before calculating MNX
     Args:
         input_las (str): Path to the LIDAR `.las/.laz` file.
-        input_geojson (str): Path to the input GeoJSON file with 3D points (if None or "", only points marking is enabled)
+        input_geometry (str): Path to the input GeoJSON file with 3D points (if None or "", only points marking is enabled)
+        spacing (float): spacing between points generated along the geometry if it  contains lines. in meters (default. 25 cm)
+        altitude_column (str): altitude column name from input geometry (use point.z if altitude_column is empty)
         output_las (str): Path to save the updated LIDAR file (LAS/LAZ format).
         dsm_dimension (str): Dimension name for the output DSM marker
         dtm_dimension (str): Dimension name for the output DTM marker
@@ -121,17 +148,18 @@ def preprocess_mnx(
     with tempfile.NamedTemporaryFile(
         prefix=Path(input_las).stem, suffix="_intermediate.laz", dir="."
     ) as tmp_las:
-
-        if input_geojson:
+        if input_geometry:
             mark_points_input_path = tmp_las.name
 
-            add_points_from_geojson_to_las(
-                input_geojson,
+            add_points_from_geometry_to_las(
+                input_geometry,
                 input_las,
                 mark_points_input_path,
                 virtual_points_classes,
                 spatial_ref,
                 tile_width,
+                spacing,
+                altitude_column,
             )
         else:
             print("No GeoJSON input provided. Skip adding points.")

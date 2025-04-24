@@ -1,3 +1,5 @@
+- In preprocessing_mnx, add ability to add virtual points from lines geometry file (ign-pdal-tools 1.8.1)
+
 ## 0.4.0
 
 - Add preprocessing_mnx script, that adds points from a geojson + mark points for dsm/dtm
