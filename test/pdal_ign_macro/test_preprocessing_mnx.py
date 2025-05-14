@@ -72,6 +72,7 @@ def test_preprocess_mnx(
     dtm_dimension = "dtm_marker"
 
     with tempfile.NamedTemporaryFile(suffix="_preprocessed_output.laz") as las_output:
+
         preprocess_mnx(
             input_las=ini_las,
             input_geometry=ini_geojson,
