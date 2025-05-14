@@ -22,5 +22,5 @@ dependencies:
   - pip
   - pip:
     - build # Installed via pip after issues when creating the environment ("build does not exist")
-    - ign-pdal-tools==1.10.0
+    - ign-pdal-tools==1.11.1
     - laspy[lazrs]

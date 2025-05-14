@@ -1,0 +1,115 @@
+FROM condaforge/mambaforge:latest AS mamba_pdal
+
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
+
+RUN conda create -n pdal_ign_plugin -y
+ARG GITHUB_SHA
+ARG GITHUB_REPOSITORY="PDAL/PDAL"
+ARG GITHUB_SERVER_URL="https://github.com"
+
+SHELL ["conda", "run", "-n", "pdal_ign_plugin", "/bin/bash", "-c"]
+
+RUN mamba install -c conda-forge git compilers conda-pack cmake make ninja sysroot_linux-64=2.17 && \
+    mamba install --yes -c conda-forge pdal --only-deps
+
+RUN rm -rf /opt/conda/envs/pdaltools/lib/libpdal*
+RUN rm -rf /opt/conda/envs/pdaltools/lib/libpdal_plugin*    
+
+RUN git clone "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" pdal && \
+    cd pdal ; \
+    git checkout ${GITHUB_SHA}
+
+RUN mkdir -p pdal/build && \
+    cd pdal/build  && \
+    CXXFLAGS="-Werror=strict-aliasing" LDFLAGS="-Wl,-rpath-link,$CONDA_PREFIX/lib" cmake -G Ninja  \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_LIBRARY_PATH:FILEPATH="$CONDA_PREFIX/lib" \
+        -DCMAKE_INCLUDE_PATH:FILEPATH="$CONDA_PREFIX/include" \
+        -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX" \
+        -DBUILD_PLUGIN_CPD=OFF \
+        -DBUILD_PLUGIN_PGPOINTCLOUD=ON \
+        -DBUILD_PLUGIN_NITF=ON \
+        -DBUILD_PLUGIN_ICEBRIDGE=ON \
+        -DBUILD_PLUGIN_HDF=ON \
+        -DBUILD_PLUGIN_TILEDB=ON \
+        -DBUILD_PLUGIN_E57=ON \
+        -DBUILD_PGPOINTCLOUD_TESTS=OFF \
+        -DWITH_ZSTD=ON \
+        ..
+
+RUN cd pdal/build  && \
+    ninja
+
+RUN cd pdal/build  && \
+    ctest -V
+
+RUN cd pdal/build  && \
+    ninja install
+
+RUN git clone https://github.com/PDAL/python.git
+
+RUN mamba install --yes -c conda-forge pybind11
+
+RUN mkdir -p python/build && \
+    cd python/build  && \
+    CXXFLAGS="-Werror=strict-aliasing" LDFLAGS="-Wl,-rpath-link,$CONDA_PREFIX/lib" cmake -G Ninja  \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_LIBRARY_PATH:FILEPATH="$CONDA_PREFIX/lib" \
+        -DCMAKE_INCLUDE_PATH:FILEPATH="$CONDA_PREFIX/include" \
+        -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX/lib/python3.13/site-packages/" \
+        ..
+
+RUN cd python/build  && ninja
+RUN cd python/build  && ctest -V
+RUN cd python/build  && ninja install
+
+RUN git clone https://github.com/PDAL/python-plugins.git pdal-python && \
+    cd pdal-python && git checkout 1.6.5  && \
+    pip install -vv . --no-deps
+
+#RUN conda-pack -n pdal_ign_plugin --dest-prefix=/opt/conda/envs/pdal_ign_plugin -o  /tmp/env.tar && \
+#     mkdir /venv && cd /venv && tar xf /tmp/env.tar  && \
+#     rm /tmp/env.tar
+
+COPY src src
+COPY CMakeLists.txt CMakeLists.txt
+RUN mkdir -p build && \
+    cd build  && \
+    CXXFLAGS="-Werror=strict-aliasing" LDFLAGS="-Wl,-rpath-link,$CONDA_PREFIX/lib" cmake -G Ninja  \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_LIBRARY_PATH:FILEPATH="$CONDA_PREFIX/lib" \
+        -DCMAKE_INCLUDE_PATH:FILEPATH="$CONDA_PREFIX/include" \
+        ..
+
+RUN cd build  && ninja
+RUN cd python/build  && ctest -V
+RUN cd build  && ninja install
+        
+# Add our environment
+RUN mamba install numpy requests gdal lastools geopandas pytest requests-mock tqdm pip
+RUN pip install laspy[lazrs]
+RUN pip install ign-pdal-tools==1.11.1
+
+FROM debian:bullseye-slim
+
+# install PDAL
+COPY --from=mamba_pdal /opt/conda/envs/pdal_ign_plugin/bin/pdal /opt/conda/envs/pdal_ign_plugin/bin/pdal
+COPY --from=mamba_pdal /opt/conda/envs/pdal_ign_plugin/bin/python /opt/conda/envs/pdal_ign_plugin/bin/python
+COPY --from=mamba_pdal /opt/conda/envs/pdal_ign_plugin/lib/ /opt/conda/envs/pdal_ign_plugin/lib/
+COPY --from=mamba_pdal /opt/conda/envs/pdal_ign_plugin/ssl /opt/conda/envs/pdal_ign_plugin/ssl
+COPY --from=mamba_pdal /opt/conda/envs/pdal_ign_plugin/share/proj/proj.db /opt/conda/envs/pdal_ign_plugin/share/proj/proj.db
+COPY --from=mamba_pdal /install/lib /plugins/lib
+
+ENV PATH=$PATH:/opt/conda/envs/pdal_ign_plugin/bin/
+ENV PROJ_LIB=/opt/conda/envs/pdal_ign_plugin/share/proj/
+ENV GDAL_DATA=/opt/conda/envs/pdal_ign_plugin/share/gdal/
+ENV PDAL_DRIVER_PATH=/plugins/lib
+
+# Install python macro module
+COPY pdal_ign_macro /pdal_ign_plugin/pdal_ign_macro
+COPY pyproject.toml /pdal_ign_plugin/pyproject.toml
+WORKDIR /pdal_ign_plugin
+#RUN pip install .
+
+# Add example scripts + test data (to be able to test inside the docker image)
+COPY test /pdal_ign_plugin/test

@@ -20,16 +20,15 @@ def test_mark_points_to_use_for_digital_models_with_new_dimension():
         mark_points_to_use_for_digital_models_with_new_dimension(
             ini_las, las_output.name, dsm_dimension, dtm_dimension, "", ""
         )
-        pipeline = pdal.Pipeline()
-        pipeline |= pdal.Reader.las(ini_las)
-        input_dimensions = set(pipeline.quickinfo["readers.las"]["dimensions"].split(", "))
-        pipeline = pdal.Pipeline()
-        pipeline |= pdal.Reader.las(las_output.name)
-        output_dimensions = set(pipeline.quickinfo["readers.las"]["dimensions"].split(", "))
+        pipeline_input = pdal.Reader.las(ini_las).pipeline()
+        input_dimensions = set(pipeline_input.quickinfo["readers.las"]["dimensions"].split(", "))
+        pipeline_output = pdal.Reader.las(las_output.name).pipeline()
+        output_dimensions = set(pipeline_output.quickinfo["readers.las"]["dimensions"].split(", "))
         assert output_dimensions == input_dimensions.union([dsm_dimension, dtm_dimension])
 
-        pipeline.execute()
-        arr = pipeline.arrays[0]
+        pipeline_output = pdal.Reader.las(las_output.name).pipeline()
+        pipeline_output.execute()
+        arr = pipeline_output.arrays[0]
         assert np.any(arr[dsm_dimension] == 1)
         assert np.any(arr[dtm_dimension] == 1)
 
@@ -48,12 +47,10 @@ def test_mark_points_to_use_for_digital_models_with_new_dimension_keep_dimension
             "",
             keep_temporary_dimensions=True,
         )
-        pipeline = pdal.Pipeline()
-        pipeline |= pdal.Reader.las(las_output.name)
-        output_dimensions = set(pipeline.quickinfo["readers.las"]["dimensions"].split(", "))
+        pipeline_mtd = pdal.Reader.las(las_output.name).pipeline()
+        output_dimensions = set(pipeline_mtd.quickinfo["readers.las"]["dimensions"].split(", "))
         assert dsm_dimension in output_dimensions
         assert dtm_dimension in output_dimensions
-
         assert all(
             [
                 dim in output_dimensions
@@ -66,6 +63,7 @@ def test_mark_points_to_use_for_digital_models_with_new_dimension_keep_dimension
             ]
         )
 
+        pipeline = pdal.Reader.las(las_output.name).pipeline()
         pipeline.execute()
         arr = pipeline.arrays[0]
         assert np.any(arr[dsm_dimension] == 1)
@@ -87,12 +85,13 @@ def test_main_no_buffer():
             keep_temporary_dims=False,
             skip_buffer=True,
         )
-        pipeline = pdal.Pipeline()
-        pipeline |= pdal.Reader.las(las_output.name)
-        output_dimensions = pipeline.quickinfo["readers.las"]["dimensions"].split(", ")
-        assert dsm_dimension in output_dimensions
-        assert dtm_dimension in output_dimensions
 
+        pipeline_mtd = pdal.Reader.las(filename=las_output.name).pipeline()
+        metadata = pipeline_mtd.quickinfo["readers.las"]["dimensions"]
+        assert dsm_dimension in metadata
+        assert dtm_dimension in metadata
+
+        pipeline = pdal.Reader.las(filename=las_output.name).pipeline()
         pipeline.execute()
         arr = pipeline.arrays[0]
         assert np.any(arr[dsm_dimension] == 1)
@@ -117,14 +116,15 @@ def test_main_with_buffer():
             tile_width=50,
             tile_coord_scale=10,
         )
-        pipeline = pdal.Pipeline()
-        pipeline |= pdal.Reader.las(las_output.name)
-        output_dimensions = pipeline.quickinfo["readers.las"]["dimensions"].split(", ")
+
+        pipeline_mtd = pdal.Reader.las(las_output.name).pipeline()
+        output_dimensions = pipeline_mtd.quickinfo["readers.las"]["dimensions"]
         assert dsm_dimension in output_dimensions
         assert dtm_dimension in output_dimensions
 
-        pipeline.execute()
-        arr = pipeline.arrays[0]
+        pipeline_out = pdal.Reader.las(las_output.name).pipeline()
+        pipeline_out.execute()
+        arr = pipeline_out.arrays[0]
         assert np.any(arr[dsm_dimension] == 1)
         assert np.any(arr[dtm_dimension] == 1)
 

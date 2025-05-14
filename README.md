@@ -117,6 +117,13 @@ marco.my_macro(...)
 
 See the `scripts` folder for example usages of this module.
 
+## Docker
+
+There are two docker files. 
+
+    - The main Dockerfile use the official pdal version. 
+    - The Dockerfile.pdal permit to use non official version of pdal (the master or a fork for exemple). See the "docker-build-pdal" command in  Makefile 
+
 ### Usage from outside the docker image:
 
 If you have a python script on your computer, you can mount its containing folder as a volume in order to
