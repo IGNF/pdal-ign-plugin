@@ -20,16 +20,16 @@ jobs:
     - name: install cppunit
       run: sudo apt install -y libcppunit-dev
 
-
     # See https://github.com/marketplace/actions/setup-micromamba
     - name: setup-micromamba
-      uses: mamba-org/setup-micromamba@v2.0.4
+      uses: mamba-org/setup-micromamba@v1.9.0
       with:
+        micromamba-version: '1.5.8-0'  # temporary fix as setup-mircomamba hangs with later mamba version
         environment-file: environment.yml
         environment-name: pdal_ign_plugin  # activate the environment
-        cache-environment: false
+        cache-environment: true
         cache-downloads: true
-        generate-run-shell: false
+        generate-run-shell: true
 
     - name: compile_plugins
       shell: micromamba-shell {0}
