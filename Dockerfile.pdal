@@ -64,9 +64,9 @@ RUN git clone https://github.com/PDAL/python-plugins.git pdal-python && \
     cd pdal-python && git checkout 1.6.2  && \
     pip install -vv . --no-deps
 
-#RUN conda-pack -n pdal_ign_plugin --dest-prefix=/opt/conda/envs/pdal_ign_plugin -o  /tmp/env.tar && \
-#     mkdir /venv && cd /venv && tar xf /tmp/env.tar  && \
-#     rm /tmp/env.tar
+RUN conda-pack -n pdal_ign_plugin --dest-prefix=/opt/conda/envs/pdal_ign_plugin -o  /tmp/env.tar && \
+     mkdir /venv && cd /venv && tar xf /tmp/env.tar  && \
+     rm /tmp/env.tar
 
 COPY src src
 COPY CMakeLists.txt CMakeLists.txt
