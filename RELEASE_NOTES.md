@@ -1,3 +1,8 @@
+### 0.4.2
+
+- Add Dockerfile.pdal for use non official version of pdal
+- fix tests to next version of pdal 
+
 ### 0.4.1
 
 - In preprocessing_mnx, add ability to add virtual points from lines geometry file (ign-pdal-tools 1.8.1)
