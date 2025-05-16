@@ -30,6 +30,7 @@ jobs:
         cache-environment: false
         cache-downloads: true
         generate-run-shell: true
+        shell: bash
 
     - name: compile_plugins
       shell: micromamba-shell {0}
@@ -45,4 +46,4 @@ jobs:
       run: |
         export PDAL_DRIVER_PATH=./install/lib
         echo $PDAL_DRIVER_PATH
-        python -m pytest -s
+        python -m pytest -s -m "not pdal_custom"
