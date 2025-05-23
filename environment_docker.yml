@@ -14,7 +14,7 @@ dependencies:
 # --------- pip & pip libraries --------- #
   - pip
   - pip:
-    - ign-pdal-tools==1.8.1
+    - ign-pdal-tools==1.10.0
     - laspy[lazrs]
 
 

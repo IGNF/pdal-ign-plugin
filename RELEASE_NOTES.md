@@ -1,3 +1,6 @@
+
+- Update to ign-pdal-tools 1.10.0 for fix in add_points_in_pointcloud
+
 ### 0.4.1
 
 - In preprocessing_mnx, add ability to add virtual points from lines geometry file (ign-pdal-tools 1.8.1)
