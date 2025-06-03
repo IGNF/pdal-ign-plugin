@@ -33,6 +33,10 @@ jobs:
         file: ./Dockerfile.pdal
         load: true
         tags: ${{ env.TEST_TAG }}
+        build-args: |
+          GITHUB_REPOSITORY=alavenant/PDAL
+          GITHUB_SHA=master_28_05_25
+
 
     # run the test on the docker build
     - name: Run tests in docker image
