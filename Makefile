@@ -50,11 +50,8 @@ clean:
 # Build/deploy Docker image
 ##############################
 
-REGISTRY=ghcr.io
-NAMESPACE=ignf
 IMAGE_NAME=pdal_ign_plugin
 VERSION=`python -m pdal_ign_macro.version`
-FULL_IMAGE_NAME=${REGISTRY}/${NAMESPACE}/${IMAGE_NAME}:${VERSION}
 
 docker-build: clean
 	docker build --no-cache -t ${IMAGE_NAME}:${VERSION} -f Dockerfile .
@@ -67,10 +64,3 @@ docker-test-pdal: clean
 
 docker-test:
 	docker run --rm -it ${IMAGE_NAME}:${VERSION} python -m pytest -s
-
-docker-remove:
-	docker rmi -f `docker images | grep ${IMAGE_NAME}:${VERSION} | tr -s ' ' | cut -d ' ' -f 3`
-
-docker-deploy:
-	docker tag ${IMAGE_NAME}:${VERSION} ${FULL_IMAGE_NAME}
-	docker push ${FULL_IMAGE_NAME}

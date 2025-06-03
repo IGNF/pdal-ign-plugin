@@ -69,3 +69,7 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+        build-args: |
+          GITHUB_REPOSITORY=alavenant/PDAL
+          GITHUB_SHA=master_28_05_25
+

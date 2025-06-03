@@ -67,10 +67,6 @@ RUN git clone https://github.com/PDAL/python-plugins.git pdal-python && \
     cd pdal-python && git checkout 1.6.5  && \
     pip install -vv . --no-deps
 
-#RUN conda-pack -n pdal_ign_plugin --dest-prefix=/opt/conda/envs/pdal_ign_plugin -o  /tmp/env.tar && \
-#     mkdir /venv && cd /venv && tar xf /tmp/env.tar  && \
-#     rm /tmp/env.tar
-
 COPY src src
 COPY CMakeLists.txt CMakeLists.txt
 RUN mkdir -p build && \
@@ -86,7 +82,7 @@ RUN cd python/build  && ctest -V
 RUN cd build  && ninja install
         
 # Add our environment
-RUN mamba install numpy requests gdal lastools geopandas pytest requests-mock tqdm pip
+RUN mamba install numpy requests gdal geopandas pytest pip
 RUN pip install laspy[lazrs]
 RUN pip install ign-pdal-tools==1.11.1
 
@@ -109,7 +105,6 @@ ENV PDAL_DRIVER_PATH=/plugins/lib
 COPY pdal_ign_macro /pdal_ign_plugin/pdal_ign_macro
 COPY pyproject.toml /pdal_ign_plugin/pyproject.toml
 WORKDIR /pdal_ign_plugin
-#RUN pip install .
 
 # Add example scripts + test data (to be able to test inside the docker image)
 COPY test /pdal_ign_plugin/test
