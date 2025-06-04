@@ -19,6 +19,7 @@ def test_pdal_read_severals_extra_dims():
     assert "confidence" in metadata["dimensions"]
 
     # Test Python PDAL bindings
+    # pipeline.quickinfo done before need that we re create the pipeline
     pipeline = pdal.Reader.las(filename=test_file).pipeline()
     num_points = pipeline.execute()
     assert num_points > 0
