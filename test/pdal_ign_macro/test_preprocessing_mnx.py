@@ -72,6 +72,7 @@ def test_preprocess_mnx(
     dtm_dimension = "dtm_marker"
 
     with tempfile.NamedTemporaryFile(suffix="_preprocessed_output.laz") as las_output:
+
         preprocess_mnx(
             input_las=ini_las,
             input_geometry=ini_geojson,
@@ -91,8 +92,13 @@ def test_preprocess_mnx(
             tile_coord_scale=10,
         )
 
-        pipeline_output = pdal.Pipeline()
-        pipeline_output |= pdal.Reader.las(las_output.name)
+        pipeline_mtd = pdal.Reader.las(las_output.name).pipeline()
+        metadata = pipeline_mtd.quickinfo["readers.las"]["dimensions"]
+        assert dsm_dimension in metadata, "DSM marker dimension not found"
+        assert dtm_dimension in metadata, "DTM marker dimension not found"
+
+        # pipeline.quickinfo done before need that we re create the pipeline
+        pipeline_output = pdal.Reader.las(las_output.name).pipeline()
         pipeline_output.execute()
         arr = pipeline_output.arrays[0]
 
@@ -102,9 +108,6 @@ def test_preprocess_mnx(
             count_66 == nb_points_added
         ), f"Expected {nb_points_added} points added with class 66, got {count_66}"
 
-        output_dimensions = set(pipeline_output.quickinfo["readers.las"]["dimensions"].split(", "))
-        assert dsm_dimension in output_dimensions, "DSM marker dimension not found"
-        assert dtm_dimension in output_dimensions, "DTM marker dimension not found"
         assert np.any(arr[dsm_dimension] == 1), "No points marked for DSM"
         assert np.any(arr[dtm_dimension] == 1), "No points marked for DTM"
         assert not np.all(arr["Intensity"] == 0), "Lost Intensity value"

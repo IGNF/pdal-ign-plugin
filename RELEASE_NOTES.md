@@ -1,5 +1,7 @@
 
-- Update to ign-pdal-tools 1.10.0 for fix in add_points_in_pointcloud
+- Update to ign-pdal-tools 1.11.1 for fix in add_points_in_pointcloud
+- Add Dockerfile.pdal for use non official version of pdal
+- fix tests to next version of pdal 
 
 ### 0.4.1
 
