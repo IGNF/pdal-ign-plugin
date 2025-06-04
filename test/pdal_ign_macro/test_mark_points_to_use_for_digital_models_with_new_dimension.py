@@ -26,6 +26,7 @@ def test_mark_points_to_use_for_digital_models_with_new_dimension():
         output_dimensions = set(pipeline_output.quickinfo["readers.las"]["dimensions"].split(", "))
         assert output_dimensions == input_dimensions.union([dsm_dimension, dtm_dimension])
 
+        # pipeline.quickinfo done before need that we re create the pipeline
         pipeline_output = pdal.Reader.las(las_output.name).pipeline()
         pipeline_output.execute()
         arr = pipeline_output.arrays[0]
@@ -62,7 +63,7 @@ def test_mark_points_to_use_for_digital_models_with_new_dimension_keep_dimension
                 ]
             ]
         )
-
+        # pipeline.quickinfo done before need that we re create the pipeline
         pipeline = pdal.Reader.las(las_output.name).pipeline()
         pipeline.execute()
         arr = pipeline.arrays[0]

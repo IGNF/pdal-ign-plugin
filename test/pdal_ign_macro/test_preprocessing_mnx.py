@@ -97,6 +97,7 @@ def test_preprocess_mnx(
         assert dsm_dimension in metadata, "DSM marker dimension not found"
         assert dtm_dimension in metadata, "DTM marker dimension not found"
 
+        # pipeline.quickinfo done before need that we re create the pipeline
         pipeline_output = pdal.Reader.las(las_output.name).pipeline()
         pipeline_output.execute()
         arr = pipeline_output.arrays[0]
