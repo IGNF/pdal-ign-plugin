@@ -1,8 +1,10 @@
+### 0.5.1
+- update ign-pdal-tools to 1.12.0 (fix "add virtual points" when there is no point to add)
 
-### 0.5.0
+## 0.5.0
 - Update to ign-pdal-tools 1.11.1 for fix in add_points_in_pointcloud
 - Add Dockerfile.pdal for use non official version of pdal
-- fix tests to next version of pdal 
+- fix tests to next version of pdal
 
 ### 0.4.1
 
