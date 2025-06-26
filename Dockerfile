@@ -1,4 +1,4 @@
-FROM mambaorg/micromamba:bullseye-slim as build
+FROM mambaorg/micromamba:bullseye-slim AS build
 
 COPY environment_docker.yml /environment_docker.yml
 
