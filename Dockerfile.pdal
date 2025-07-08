@@ -84,7 +84,7 @@ RUN cd build  && ninja install
 # Add our environment
 RUN mamba install numpy requests gdal geopandas pytest pip
 RUN pip install laspy[lazrs]
-RUN pip install ign-pdal-tools==1.11.1
+RUN pip install ign-pdal-tools==1.12.2
 
 FROM debian:bullseye-slim
 
