@@ -12,6 +12,8 @@ SHELL ["conda", "run", "-n", "pdal_ign_plugin", "/bin/bash", "-c"]
 RUN mamba install -c conda-forge git compilers conda-pack cmake make ninja sysroot_linux-64=2.17 && \
     mamba install --yes -c conda-forge pdal --only-deps
 
+RUN mamba install numpy requests gdal geopandas pytest pip
+
 RUN rm -rf /opt/conda/envs/pdaltools/lib/libpdal*
 RUN rm -rf /opt/conda/envs/pdaltools/lib/libpdal_plugin*    
 
@@ -82,9 +84,8 @@ RUN cd python/build  && ctest -V
 RUN cd build  && ninja install
         
 # Add our environment
-RUN mamba install numpy requests gdal geopandas pytest pip
 RUN pip install laspy[lazrs]
-RUN pip install ign-pdal-tools==1.12.2
+RUN pip install ign-pdal-tools==1.12.3
 
 FROM debian:bullseye-slim
 
