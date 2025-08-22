@@ -1,3 +1,8 @@
+### 0.5.4
+
+- update ign-pdal-tools to 1.12.3 in Docker.pdal (fix add_points_in_pointcloud: crs format consistency)
+
+
 ### 0.5.3
 
 - update ign-pdal-tools to 1.12.3 (fix add_points_in_pointcloud: crs format consistency)
