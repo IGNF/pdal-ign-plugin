@@ -1,3 +1,8 @@
+
+### dev
+
+- update mark_points_to_use_for_digital_models_with_new_dimension to handle points with classification 68
+
 ### 0.5.4
 
 - update ign-pdal-tools to 1.12.3 in Docker.pdal (fix add_points_in_pointcloud: crs format consistency)

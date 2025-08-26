@@ -218,7 +218,7 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
     #       Initialisation pour le MNT
     #       Initialisation pour le MNS
 
-    # 3.1 Pour le MNT (le point sol max sur uen grille de 50cm)
+    # 3.1 Pour le MNT (le point sol max sur une grille de 50cm)
     # TODO: remplacer par GridDecimation une fois le correctif mergé dans PDAL
     pipeline |= pdal.Filter.grid_decimation_deprecated(
         resolution=0.5,
@@ -250,7 +250,7 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
         where="(PT_UNDER_VEGET==0 && PT_ON_SOL==0 && PT_ON_VIRT==0 && Classification==9)",
     )
     ###################################################################################################################
-    # 4 - Gestion des points sol sous la veget,bâtis et ponts pour le MNS
+    # 4 - Gestion des points sol sous la veget, bâtis et ponts pour le MNS
     ###################################################################################################################
     #       On enlève les points sol sous la véget, le bati et les ponts du taguage pour les MNS
     #       Particularité de reprise des points sol au plus près des bâtiments
@@ -307,6 +307,7 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
         max2d_below=0.5,
     )
     pipeline |= pdal.Filter.assign(value=[f"{dsm_dimension}=0 WHERE PT_UNDER_BRIDGE==1"])
+
     ###################################################################################################################
     # 6 - Ajout des point pour MNT (sol) qui servent au MNS également
     ###################################################################################################################
@@ -324,7 +325,7 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
     # Gestion des pts virtuels qui sont sous la végétation ou autres pour le MNS
     # Taguage pour les MNS des points vituels "eau" seulement
 
-    # 7.1 Taguade pour les MNT des points virtuels ponts et eau
+    # 7.1 Taguage pour les MNT des points virtuels ponts et eau
     pipeline |= pdal.Filter.assign(value=[f"{dtm_dimension}=1 WHERE Classification==66"])
     # 7.2 gestion des pts 66 "eau" sous le sursol
     pipeline = macro.add_radius_assign(
@@ -358,8 +359,15 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
         ]
     )
 
+    ###################################################################################################################
+    # 8 - Gestion des pts 68 (mns pour le sol) / MNT
+    ###################################################################################################################
+
+    # 8.1 Taguage pour les MNT des points issus d'un MNS de correlation
+    pipeline |= pdal.Filter.assign(value=[f"{dtm_dimension}=1 WHERE Classification==68"])
+
     ##################################################################################################################
-    # 8 - export du nuage et des DSM
+    # 9 - export du nuage et des DSM
     ###################################################################################################################
     pipeline |= pdal.Writer.las(
         extra_dims="all", forward="all", filename=output_las, minor_version="4"
