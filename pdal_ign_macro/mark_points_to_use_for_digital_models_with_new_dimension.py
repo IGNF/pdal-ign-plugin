@@ -363,7 +363,7 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
     # 8 - Gestion des pts 68 (mns pour le sol) / MNT
     ###################################################################################################################
 
-    # 8.1 Taguage pour les MNT des points virtuels ponts et eau
+    # 8.1 Taguage pour les MNT des points issus d'un MNS de correlation
     pipeline |= pdal.Filter.assign(value=[f"{dtm_dimension}=1 WHERE Classification==68"])
 
     ##################################################################################################################
