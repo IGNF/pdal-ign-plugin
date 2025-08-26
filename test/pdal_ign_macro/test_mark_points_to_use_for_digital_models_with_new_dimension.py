@@ -149,7 +149,7 @@ def test_parse_args():
         "bat.laz",
         "pont.laz",
         "corse.laz",
-        # "68.laz"
+        "68.laz",
     ],
 )
 def test_algo_mark_points_for_dm_with_reference(crop):
