@@ -1,5 +1,5 @@
 
-### dev
+### 0.5.5
 
 - update mark_points_to_use_for_digital_models_with_new_dimension to handle points with classification 68
 
