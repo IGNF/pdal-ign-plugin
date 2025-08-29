@@ -85,7 +85,7 @@ RUN cd build  && ninja install
         
 # Add our environment
 RUN pip install laspy[lazrs]
-RUN pip install ign-pdal-tools==1.12.3
+RUN pip install ign-pdal-tools==1.13.0
 
 FROM debian:bullseye-slim
 

@@ -3,6 +3,7 @@ import tempfile
 import numpy as np
 import pdal
 import pytest
+from pdaltools.las_info import las_info_metadata
 
 from pdal_ign_macro.main_preprocessing_mnx import preprocess_mnx
 
@@ -63,6 +64,15 @@ from pdal_ign_macro.main_preprocessing_mnx import preprocess_mnx
             False,
             53,
         ),
+        (
+            # laz with extra dimensions
+            "test/data/buffer/test_data_77055_627760_LA93_IGN69_extra_dims.laz",
+            "test/data/points_3d/Points_virtuels_77055_627760.geojson",
+            0,
+            "RecupZ",
+            False,
+            3,
+        ),
     ],
 )
 def test_preprocess_mnx(
@@ -70,6 +80,9 @@ def test_preprocess_mnx(
 ):
     dsm_dimension = "dsm_marker"
     dtm_dimension = "dtm_marker"
+
+    metadata_input = las_info_metadata(ini_las)
+    input_dimensions = metadata_input["dimensions"]
 
     with tempfile.NamedTemporaryFile(suffix="_preprocessed_output.laz") as las_output:
 
@@ -91,6 +104,12 @@ def test_preprocess_mnx(
             tile_width=50,
             tile_coord_scale=10,
         )
+
+        metadata_output = las_info_metadata(las_output.name)
+        output_dimensions = metadata_output["dimensions"]
+
+        # preprocess_mnx shoud preserve all dimensions from the input file
+        assert input_dimensions in output_dimensions
 
         pipeline_mtd = pdal.Reader.las(las_output.name).pipeline()
         metadata = pipeline_mtd.quickinfo["readers.las"]["dimensions"]
