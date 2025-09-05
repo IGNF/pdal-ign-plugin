@@ -1,3 +1,10 @@
+### 0.5.7
+
+- fix version number and CI compilation
+
+### 0.5.6
+
+- update ign-pdal-tools to 1.13.0 (fix preserve extra dimensions to the output las file in add_points_in_pointcloud)
 
 ### 0.5.5
 
