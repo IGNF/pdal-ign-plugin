@@ -1,10 +1,10 @@
 import csv
 import json
 import math
+import os
 import tempfile
 from test import utils
 
-import numpy as np
 import pdal
 import pdaltools.las_info as li
 import pytest
@@ -128,9 +128,6 @@ def test_grid_decimation_empty():
         )
         pipeline.execute()
 
-        with open(tmp_out_wkt.name, "r") as f:
-            reader = csv.reader(f, delimiter="\t")
-            lines = [line for line in reader]
-            assert len(lines) == 0
-
-        assert np.all(pipeline.arrays[0]["grid"] == 0)
+        # since pdal 2.9, the filter is not run if the view is empty
+        # => the output wkt file is not created
+        assert not os.path.exists(tmp_out_wkt.name)
