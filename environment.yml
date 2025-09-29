@@ -6,7 +6,7 @@ channels:
 dependencies:
   - python=3.12.*
   - numpy
-  - conda-forge:pdal==2.8.*
+  - conda-forge:pdal>=2.9.*
   - conda-forge:python-pdal>=3.4
   - gdal
   - geopandas
@@ -22,5 +22,5 @@ dependencies:
   - pip
   - pip:
     - build # Installed via pip after issues when creating the environment ("build does not exist")
-    - ign-pdal-tools==1.13.0 # don't forget to update this version in environment_docker.yml as well
+    - ign-pdal-tools==1.15.0 # don't forget to update this version in environment_docker.yml as well
     - laspy[lazrs]

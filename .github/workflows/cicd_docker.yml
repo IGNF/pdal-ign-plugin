@@ -30,13 +30,9 @@ jobs:
       id: build
       uses: docker/build-push-action@v5
       with:
-        file: ./Dockerfile.pdal
+        file: ./Dockerfile
         load: true
         tags: ${{ env.TEST_TAG }}
-        build-args: |
-          GITHUB_REPOSITORY=alavenant/PDAL
-          GITHUB_SHA=master_28_05_25
-
 
     # run the test on the docker build
     - name: Run tests in docker image
@@ -68,12 +64,8 @@ jobs:
       if: ${{ github.event_name != 'pull_request' }}
       uses: docker/build-push-action@v5
       with:
-        file: ./Dockerfile.pdal
+        file: ./Dockerfile
         context: .
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        build-args: |
-          GITHUB_REPOSITORY=alavenant/PDAL
-          GITHUB_SHA=master_28_05_25
-
