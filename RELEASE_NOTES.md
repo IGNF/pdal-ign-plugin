@@ -1,6 +1,6 @@
 ### dev
 
-- update ign-pdal-tools to 1.15.0 (use pdal>=2.9 and replace_area_in_pointcloud)
+- lib: update ign-pdal-tools to 1.15.0 (use pdal>=2.9)
 - use pdal>=2.9 and deactivate the Dockerfile.pdal from CI
 
 ### 0.5.7
