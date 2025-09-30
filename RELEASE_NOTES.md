@@ -1,3 +1,8 @@
+### dev
+
+- lib: update ign-pdal-tools to 1.15.0 (use pdal>=2.9)
+- use pdal>=2.9 and deactivate the Dockerfile.pdal from CI
+
 ### 0.5.7
 
 - fix version number and CI compilation

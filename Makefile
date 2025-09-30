@@ -52,15 +52,14 @@ clean:
 
 IMAGE_NAME=pdal_ign_plugin
 VERSION=`python -m pdal_ign_macro.version`
+CUSTOM_PDAL_SHA=master_28_05_25
+CUSTOM_PDAL_REPOSITORY=alavenant/PDAL
 
 docker-build: clean
 	docker build --no-cache -t ${IMAGE_NAME}:${VERSION} -f Dockerfile .
 
-docker-build-pdal: clean
-	docker build --build-arg GITHUB_REPOSITORY=alavenant/PDAL --build-arg GITHUB_SHA=master_28_05_25 -t ${IMAGE_NAME}:${VERSION} -f Dockerfile.pdal .
+docker-build-custom-pdal: clean
+	docker build --build-arg GITHUB_REPOSITORY=${CUSTOM_PDAL_REPOSITORY} --build-arg GITHUB_SHA=${CUSTOM_PDAL_SHA} -t ${IMAGE_NAME}:${VERSION} -f Dockerfile.pdal .
 
 docker-test-pdal: clean
 	docker run --rm  -v `pwd`/tmp_data:/output -t ${IMAGE_NAME}:${VERSION} python -m pytest --log-cli-level=debug 
-
-docker-test:
-	docker run --rm -it ${IMAGE_NAME}:${VERSION} python -m pytest -s

@@ -1,14 +1,16 @@
+"""
+test some PDAL features
+"""
+
 import os
 
 import pdal
-import pytest
 
 TEST_PATH = os.path.dirname(os.path.abspath(__file__))
 
 
-# this test only works with PDAL compiled on a custom fork and branch, so we mark it to avoid running it.
-@pytest.mark.pdal_custom
 def test_pdal_read_severals_extra_dims():
+    # test that we can read a las file with several extra dims
     test_file = os.path.join(TEST_PATH, "data/las_with_several_extra_byte_bloc.laz")
 
     pipeline = pdal.Reader.las(filename=test_file).pipeline()

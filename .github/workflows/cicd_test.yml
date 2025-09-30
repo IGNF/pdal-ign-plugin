@@ -20,7 +20,6 @@ jobs:
     - name: install cppunit
       run: sudo apt install -y libcppunit-dev
 
-
     # See https://github.com/marketplace/actions/setup-micromamba
     - name: setup-micromamba
       uses: mamba-org/setup-micromamba@v2.0.4
@@ -40,10 +39,9 @@ jobs:
        cmake -G"Unix Makefiles" -DCONDA_PREFIX=$MAMBA_ROOT_PREFIX -DCMAKE_BUILD_TYPE=Release ../
        make install
 
-
     - name: run tests
       shell: micromamba-shell {0}
       run: |
         export PDAL_DRIVER_PATH=./install/lib
         echo $PDAL_DRIVER_PATH
-        python -m pytest -s -m "not pdal_custom"
+        python -m pytest -s
