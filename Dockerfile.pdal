@@ -85,6 +85,7 @@ RUN mkdir -p build && \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_LIBRARY_PATH:FILEPATH="$CONDA_PREFIX/lib" \
         -DCMAKE_INCLUDE_PATH:FILEPATH="$CONDA_PREFIX/include" \
+        -DCMAKE_INSTALL_PREFIX="$CONDA_PREFIX/envs/pdal_ign_plugin" \
         ..
 
 RUN cd build  && ninja

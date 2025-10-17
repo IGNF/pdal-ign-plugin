@@ -18,7 +18,7 @@ namespace pdal
 {
 
 // keep selected points on a grid
-class PDAL_DLL GridDecimationFilter : public Filter
+class GridDecimationFilter : public Filter
 {
 public:
     GridDecimationFilter();
