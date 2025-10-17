@@ -1,4 +1,4 @@
-name: cicd_test
+name: cicd_test_windows
 
 on:
   # Run each time some code is pushed on any branch
@@ -11,14 +11,12 @@ on:
 jobs:
 
   build_and_run_tests:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - name: Checkout branch
       uses: actions/checkout@v4
-
-    - name: install cppunit
-      run: sudo apt install -y libcppunit-dev
+        
 
     # See https://github.com/marketplace/actions/setup-micromamba
     - name: setup-micromamba
@@ -29,23 +27,21 @@ jobs:
         cache-environment: false
         cache-downloads: true
         generate-run-shell: true
-        shell: bash
+        shell: cmd
+
 
     - name: compile_plugins
-      shell: micromamba-shell {0}
       run: |
-       mkdir -p build
-       cd build
-       cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$MAMBA_ROOT_PREFIX/envs/pdal_ign_plugin/ ../
-       make install
+       micromamba run -n pdal_ign_plugin mkdir build
+       micromamba run -n pdal_ign_plugin cmd /c "cd build && cmake -DCONDA_PREFIX=%MAMBA_ROOT_PREFIX% -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=%MAMBA_ROOT_PREFIX%\\envs\pdal_ign_plugin\Library\ ../"
+       micromamba run -n pdal_ign_plugin cmd /c "cd build && cmake --build . --config Release --target install"
+
 
     - name: Show PDAL drivers with PDAL_DRIVER_PATH
-      shell: micromamba-shell {0}
       run: |
-        echo PDAL_DRIVER_PATH: $PDAL_DRIVER_PATH
-        pdal --drivers
+        micromamba run -n pdal_ign_plugin cmd /c "echo PDAL_DRIVER_PATH: %PDAL_DRIVER_PATH% && pdal --drivers"
+
 
     - name: run tests
-      shell: micromamba-shell {0}
       run: |
-        python -m pytest -s
+        micromamba run -n pdal_ign_plugin cmd /c "echo PDAL_DRIVER_PATH: %PDAL_DRIVER_PATH% && python -m pytest -s"

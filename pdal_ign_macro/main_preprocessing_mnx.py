@@ -146,7 +146,7 @@ def preprocess_mnx(
     # If no GeoJSON input is provided, we cannot add or mark points
 
     with tempfile.NamedTemporaryFile(
-        prefix=Path(input_las).stem, suffix="_intermediate.laz", dir="."
+        prefix=Path(input_las).stem, suffix="_intermediate.laz", dir=".", delete_on_close=False
     ) as tmp_las:
         if input_geometry:
             mark_points_input_path = tmp_las.name
