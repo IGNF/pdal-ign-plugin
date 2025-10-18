@@ -10,7 +10,7 @@ extern "C" PF_ExitFunc RadiusAssignFilter_InitPlugin();
 namespace pdal
 {
 
-class PDAL_DLL RadiusAssignFilter : public Filter
+class RadiusAssignFilter : public Filter
 {
 public:
     RadiusAssignFilter();

@@ -1,0 +1,39 @@
+name: cicd_test_windows
+
+on:
+  # Run each time some code is pushed on any branch
+  push:
+    branches:
+      - '**'
+    paths-ignore:
+      - 'doc/**'
+
+jobs:
+
+  build_and_run_tests:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout branch
+      uses: actions/checkout@v4
+
+    # See https://github.com/marketplace/actions/setup-micromamba
+    - name: setup-micromamba
+      uses: mamba-org/setup-micromamba@v2.0.4
+      with:
+        environment-file: environment.yml
+        environment-name: pdal_ign_plugin  # activate the environment
+        cache-environment: false
+        cache-downloads: true
+        generate-run-shell: true
+        shell: cmd
+
+    - name: compile_plugins
+      run: |
+       micromamba run -n pdal_ign_plugin mkdir build
+       micromamba run -n pdal_ign_plugin cmd /c "cd build && cmake -G\"Visual Studio 17 2022\" -DCONDA_PREFIX=%MAMBA_ROOT_PREFIX% -DCMAKE_BUILD_TYPE=Release ../"
+       micromamba run -n pdal_ign_plugin cmd /c "cd build && cmake --build . --config Release --target install"
+
+    - name: run tests
+      run: |
+        micromamba run -n pdal_ign_plugin cmd /c "set PDAL_DRIVER_PATH=.\install\lib && echo %PDAL_DRIVER_PATH% && python -m pytest -s"

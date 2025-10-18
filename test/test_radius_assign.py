@@ -38,7 +38,7 @@ def run_filter(arrays_las, distance_radius, search_3d, limit_z_above=-1, limit_w
     filter = "filters.radius_assign"
     utils.pdal_has_plugin(filter)
 
-    with tempfile.NamedTemporaryFile(suffix="_las_tmp.las") as las:
+    with tempfile.NamedTemporaryFile(suffix="_las_tmp.las", delete_on_close=False) as las:
         pipeline = pdal.Writer.las(filename=las.name).pipeline(arrays_las)
         pipeline.execute()
 
