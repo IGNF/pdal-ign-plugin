@@ -31,7 +31,7 @@ jobs:
     - name: compile_plugins
       run: |
        micromamba run -n pdal_ign_plugin mkdir build
-       micromamba run -n pdal_ign_plugin cmd /c "cd build && cmake -G \"Visual Studio 17 2022\" -DCONDA_PREFIX=%MAMBA_ROOT_PREFIX% -DCMAKE_BUILD_TYPE=Release ../"
+       micromamba run -n pdal_ign_plugin cmd /c "cd build && cmake -G\'Visual Studio 17 2022\' -DCONDA_PREFIX=%MAMBA_ROOT_PREFIX% -DCMAKE_BUILD_TYPE=Release ../"
        micromamba run -n pdal_ign_plugin cmd /c "cd build && cmake --build . --config Release --target install"
 
     - name: run tests
