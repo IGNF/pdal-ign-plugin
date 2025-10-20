@@ -16,7 +16,9 @@ def test_mark_points_to_use_for_digital_models_with_new_dimension():
     ini_las = "test/data/4_6.las"
     dsm_dimension = "dsm_marker"
     dtm_dimension = "dtm_marker"
-    with tempfile.NamedTemporaryFile(suffix="_mark_points_output.las", delete_on_close=False) as las_output:
+    with tempfile.NamedTemporaryFile(
+        suffix="_mark_points_output.las", delete_on_close=False
+    ) as las_output:
         mark_points_to_use_for_digital_models_with_new_dimension(
             ini_las, las_output.name, dsm_dimension, dtm_dimension, "", ""
         )
@@ -38,7 +40,9 @@ def test_mark_points_to_use_for_digital_models_with_new_dimension_keep_dimension
     ini_las = "test/data/4_6.las"
     dsm_dimension = "dsm_marker"
     dtm_dimension = "dtm_marker"
-    with tempfile.NamedTemporaryFile(suffix="_mark_points_output.las", delete_on_close=False) as las_output:
+    with tempfile.NamedTemporaryFile(
+        suffix="_mark_points_output.las", delete_on_close=False
+    ) as las_output:
         mark_points_to_use_for_digital_models_with_new_dimension(
             ini_las,
             las_output.name,
@@ -75,7 +79,9 @@ def test_main_no_buffer():
     ini_las = "test/data/4_6.las"
     dsm_dimension = "dsm_marker"
     dtm_dimension = "dtm_marker"
-    with tempfile.NamedTemporaryFile(suffix="_mark_points_output.las", delete_on_close=False) as las_output:
+    with tempfile.NamedTemporaryFile(
+        suffix="_mark_points_output.las", delete_on_close=False
+    ) as las_output:
         main(
             ini_las,
             las_output.name,
@@ -103,7 +109,9 @@ def test_main_with_buffer():
     ini_las = "test/data/buffer/test_data_77055_627755_LA93_IGN69.laz"
     dsm_dimension = "dsm_marker"
     dtm_dimension = "dtm_marker"
-    with tempfile.NamedTemporaryFile(suffix="_mark_points_output.las", delete_on_close=False) as las_output:
+    with tempfile.NamedTemporaryFile(
+        suffix="_mark_points_output.las", delete_on_close=False
+    ) as las_output:
         main(
             ini_las,
             las_output.name,
