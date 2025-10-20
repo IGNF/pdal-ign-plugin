@@ -84,7 +84,9 @@ def test_preprocess_mnx(
     metadata_input = las_info_metadata(ini_las)
     input_dimensions = metadata_input["dimensions"]
 
-    with tempfile.NamedTemporaryFile(suffix="_preprocessed_output.laz", delete_on_close=False) as las_output:
+    with tempfile.NamedTemporaryFile(
+        suffix="_preprocessed_output.laz", delete_on_close=False
+    ) as las_output:
         print(las_output.name)
 
         preprocess_mnx(
@@ -157,7 +159,9 @@ def test_preprocess_mnx_fail(ini_las, ini_geojson, skip_buffer, error_type):
     dtm_dimension = "dtm_marker"
 
     with pytest.raises(error_type):
-        with tempfile.NamedTemporaryFile(suffix="_preprocessed_output.laz", delete_on_close=False) as las_output:
+        with tempfile.NamedTemporaryFile(
+            suffix="_preprocessed_output.laz", delete_on_close=False
+        ) as las_output:
             preprocess_mnx(
                 input_las=ini_las,
                 input_geometry=ini_geojson,

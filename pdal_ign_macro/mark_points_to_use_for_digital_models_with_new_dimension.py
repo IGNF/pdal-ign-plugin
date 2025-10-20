@@ -386,7 +386,9 @@ def mark_points_to_use_for_digital_models_with_new_dimension(
     keep_temporary_dimensions=False,
 ):
 
-    with tempfile.NamedTemporaryFile(suffix="_with_temporary_dims.las", dir=".", delete_on_close=False) as tmp_las:
+    with tempfile.NamedTemporaryFile(
+        suffix="_with_temporary_dims.las", dir=".", delete_on_close=False
+    ) as tmp_las:
         pipeline, temporary_dimensions = define_marking_pipeline(
             input_las,
             tmp_las.name,

@@ -19,7 +19,9 @@ def run_filter(output_type, resolution):
 
     ini_las = "test/data/4_6.las"
 
-    tmp_out_wkt = tempfile.NamedTemporaryFile(suffix=f"_{resolution}.wkt", delete_on_close=False).name
+    tmp_out_wkt = tempfile.NamedTemporaryFile(
+        suffix=f"_{resolution}.wkt", delete_on_close=False
+    ).name
 
     filter_name = "filters.grid_decimation_deprecated"
     utils.pdal_has_plugin(filter_name)
