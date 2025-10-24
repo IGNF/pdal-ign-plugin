@@ -1,5 +1,7 @@
 ### dev
-
+- lib: update ign-pdal-tools to 1.15.6
+  - from 1.15.2: add_points_to_pointcloud: remove duplicate points added from geometry before adding in the result las
+  - from 1.15.6: fix use of tempory file in windows
 - lib: update ign-pdal-tools to 1.15.0 (use pdal>=2.9)
 - use pdal>=2.9 and deactivate the Dockerfile.pdal from CI
 
