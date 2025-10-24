@@ -1,4 +1,6 @@
 ### dev
+
+# 0.5.8
 - lib: update ign-pdal-tools to 1.15.6
   - from 1.15.2: add_points_to_pointcloud: remove duplicate points added from geometry before adding in the result las
   - from 1.15.6: fix use of tempory file in windows
