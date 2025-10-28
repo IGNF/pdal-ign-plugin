@@ -1,4 +1,5 @@
 ### dev
+- update mark_points_to_use_for_digital_models_with_new_dimension to allow to reset tags if needed
 
 # 0.5.8
 - lib: update ign-pdal-tools to 1.15.6
