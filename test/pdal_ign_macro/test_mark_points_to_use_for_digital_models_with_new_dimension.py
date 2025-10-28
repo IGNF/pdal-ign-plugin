@@ -218,3 +218,40 @@ def test_algo_mark_points_for_dm_with_reference(crop):
             assert (
                 num_not_dtm == 0
             ), f"Found {num_not_dtm} points with Classification == 68 but {dtm_dimension} != 1"
+
+
+def test_reset_tags():
+    ini_las = "test/data/test_data_1639_1455_LA93_IGN69.las"
+    dsm_dimension = "dsm_marker"
+    dtm_dimension = "dtm_marker"
+
+
+    pipeline = pdal.Pipeline() | pdal.Reader.las(filename=ini_las)
+    pipeline |= pdal.Filter.expression(expression="dtm_marker==0 || dsm_marker==0") # all points should have tags = 1
+    count = pipeline.execute()
+
+    assert count == 0
+
+    with tempfile.NamedTemporaryFile(suffix="_after.las", delete_on_close=False) as las_output:
+        main(
+            ini_las,
+            las_output.name,
+            dsm_dimension,
+            dtm_dimension,
+            "",
+            "",
+            False,
+            False,
+            25,
+            "EPSG:2154",
+            1000,
+            1000,
+            True
+        )
+
+        pipeline = pdal.Pipeline() | pdal.Reader.las(las_output.name)
+        pipeline |= pdal.Filter.expression(expression="dtm_marker==0 || dsm_marker==0")
+        count = pipeline.execute()
+    
+        assert count > 0 # some tags should have been reset to 0
+    
