@@ -78,11 +78,18 @@ def parse_args(argv=None):
         default=1000,
         help="scale used in the filename to describe coordinates in meters (required when running with a buffer)",
     )
+    parser.add_argument(
+        "--reset_tags",
+        type=bool,
+        default=False,
+        required=False,
+        help="reset tags at the beginning of the process"
+    )
 
     return parser.parse_args(argv)
 
 
-def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension):
+def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension, reset_tags):
     pipeline = pdal.Pipeline() | pdal.Reader.las(input_las)
 
     # 0 - ajout de dimensions temporaires et de sortie
@@ -97,6 +104,11 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension)
     added_dimensions = [dtm_dimension, dsm_dimension] + temporary_dimensions
 
     pipeline |= pdal.Filter.ferry(dimensions="=>" + ", =>".join(added_dimensions))
+
+    if reset_tags:
+        # Reset each tag dimension to 0
+        for tag_dimension in added_dimensions:
+            pipeline |= pdal.Filter.assign(value=[f"{tag_dimension}=0"])
 
     ###################################################################################################################
     # 1 - Gestion de la végétation pour le calcul du DSM:
@@ -384,6 +396,7 @@ def mark_points_to_use_for_digital_models_with_new_dimension(
     output_dsm,
     output_dtm,
     keep_temporary_dimensions=False,
+    reset_tags=False,
 ):
 
     with tempfile.NamedTemporaryFile(
@@ -394,6 +407,7 @@ def mark_points_to_use_for_digital_models_with_new_dimension(
             tmp_las.name,
             dsm_dimension,
             dtm_dimension,
+            reset_tags
         )
 
         if output_dtm:
@@ -439,6 +453,7 @@ def main(
     spatial_ref="EPSG:2154",
     tile_width=1000,
     tile_coord_scale=1000,
+    reset_tags=False
 ):
     if skip_buffer:
         mark_points_to_use_for_digital_models_with_new_dimension(
@@ -449,6 +464,7 @@ def main(
             output_dsm,
             output_dtm,
             keep_temporary_dims,
+            reset_tags,
         )
     else:
         mark_with_buffer = run_on_buffered_las(
@@ -463,6 +479,7 @@ def main(
             output_dsm,
             output_dtm,
             keep_temporary_dims,
+            reset_tags,
         )
 
 
