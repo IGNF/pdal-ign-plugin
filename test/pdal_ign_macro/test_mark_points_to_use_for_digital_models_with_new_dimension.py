@@ -1,6 +1,7 @@
 import inspect
 import tempfile
 
+import os
 import numpy as np
 import pdal
 import pytest
@@ -222,55 +223,76 @@ def test_algo_mark_points_for_dm_with_reference(crop):
 
 
 def test_reset_tags():
-    ini_las = "test/data/test_data_1639_1455_LA93_IGN69.las"
+    ini_las = "test/data/4_6.las"
     dsm_dimension = "dsm_marker"
     dtm_dimension = "dtm_marker"
+
+    tmp_files = []
+    tmp_test_dir = "test/data/tmp_test_dir"
+    if not os.path.exists(tmp_test_dir):
+        os.makedirs(tmp_test_dir)
 
     # check that extra are not in initial file
     ini = laspy.read(ini_las, "r")
     assert dtm_dimension not in ini.point_format.dimension_names
     assert dsm_dimension not in ini.point_format.dimension_names
 
-    # run mark-points with reset_tags=False
-    with tempfile.NamedTemporaryFile(suffix="_before.las", delete_on_close=False) as las_output:    
-        main(
-            ini_las,
-            las_output.name,
-            dsm_dimension,
-            dtm_dimension,
-            "",
-            "",
-        )
+    las_step1 = tmp_test_dir + "/las_step1.las"
+    tmp_files.append(las_step1)
+    # run mark-points  
+    main(
+        ini_las,
+        las_step1,
+        dsm_dimension,
+        dtm_dimension,
+        "",
+        "",
+        skip_buffer=True,
+    )
 
-        # check count of points with dsm_marker==0 or dtm_marker==0
-        pipeline = pdal.Pipeline() | pdal.Reader.las(filename=las_output.name)
-        pipeline |= pdal.Filter.expression(expression=f"{dsm_dimension}==0 || {dtm_dimension}==0")
-        ini_count = pipeline.execute()
+    # check count of points with dsm_marker==0 or dtm_marker==0
+    pipeline = pdal.Pipeline() | pdal.Reader.las(filename=las_step1)
+    pipeline |= pdal.Filter.expression(expression=f"{dsm_dimension}==0 || {dtm_dimension}==0")
+    ini_count = pipeline.execute()
+    assert ini_count == 14997
 
-        # assign value=1 to all points for dsm_marker and dtm_marker
-        pipeline = pdal.Pipeline() | pdal.Reader.las(filename=las_output.name)
-        pipeline |= pdal.Filter.assign(value=[f"{dsm_dimension}=1", f"{dtm_dimension}=1"])
-        # check count of points with dsm_marker==0 or dtm_marker==0, should be 0
-        pipeline |= pdal.Filter.expression(expression=f"{dsm_dimension}==0 || {dtm_dimension}==0")
-        after_assign_count = pipeline.execute()
+    print(f"ini_count = {ini_count}")
 
-        assert after_assign_count == 0
+    # assign value=1 to all points for dsm_marker and dtm_marker
+    pipeline = pdal.Pipeline() | pdal.Reader.las(filename=las_step1)
+    pipeline |= pdal.Filter.assign(value=[f"{dsm_dimension}=1", f"{dtm_dimension}=1"])
+    las_step2 = tmp_test_dir + "/las_step2.las"
+    tmp_files.append(las_step2)
+    pipeline |= pdal.Writer.las(filename=las_step2, extra_dims="all")
+    pipeline.execute()
+    # check count of points with dsm_marker==0 or dtm_marker==0, should be 0
+    pipeline = pdal.Pipeline() | pdal.Reader.las(filename=las_step2)
+    pipeline |= pdal.Filter.expression(expression=f"{dsm_dimension}==0 || {dtm_dimension}==0")
+    after_assign_count = pipeline.execute()
 
-        # run mark-points with reset_tags=True
-        with tempfile.NamedTemporaryFile(suffix="_after.las", delete_on_close=False) as las_after:
-            main(
-                ini_las,
-                las_after.name,
-                dsm_dimension,
-                dtm_dimension,
-                output_dsm="",
-                output_dtm="",
-                reset_tags=True
-            )
+    assert after_assign_count == 0
 
-            pipeline = pdal.Pipeline() | pdal.Reader.las(las_after.name)
-            pipeline |= pdal.Filter.expression(expression=f"{dtm_dimension}==0 || {dsm_dimension}==0")
-            after_reset_count = pipeline.execute()
+    las_step3 = tmp_test_dir + "/las_step3.las"
+    tmp_files.append(las_step3)
+    # run mark-points with reset_tags=True
+    main(
+        las_step2,
+        las_step3,
+        dsm_dimension,
+        dtm_dimension,
+        output_dsm="",
+        output_dtm="",
+        reset_tags=True,
+        skip_buffer=True,
+    )
+
+    pipeline = pdal.Pipeline() | pdal.Reader.las(las_step3)
+    pipeline |= pdal.Filter.expression(expression=f"{dtm_dimension}==0 || {dsm_dimension}==0")
+    after_reset_count = pipeline.execute()
         
-            assert after_reset_count == ini_count # tags should have been reset, equal to initial count
-        
+    # clean temp dir
+    for file in tmp_files:
+        os.remove(file)
+    os.rmdir(tmp_test_dir)
+
+    assert after_reset_count == ini_count # tags should have been reset, equal to initial count

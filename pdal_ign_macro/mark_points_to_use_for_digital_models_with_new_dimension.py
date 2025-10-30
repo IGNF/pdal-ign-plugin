@@ -103,12 +103,12 @@ def define_marking_pipeline(input_las, output_las, dsm_dimension, dtm_dimension,
     ]
     added_dimensions = [dtm_dimension, dsm_dimension] + temporary_dimensions
 
+    pipeline |= pdal.Filter.ferry(dimensions="=>" + ", =>".join(added_dimensions))
+
     if reset_tags:
         # Reset each tag dimension to 0
         for tag_dimension in added_dimensions:
             pipeline |= pdal.Filter.assign(value=[f"{tag_dimension}=0"])
-
-    pipeline |= pdal.Filter.ferry(dimensions="=>" + ", =>".join(added_dimensions))
 
     ###################################################################################################################
     # 1 - Gestion de la végétation pour le calcul du DSM:
