@@ -1,5 +1,8 @@
 ### dev
 
+# 0.6.1
+- update preprocessing_mnx to allow to reset tags if needed
+
 # 0.6.0
 - update mark_points_to_use_for_digital_models_with_new_dimension to allow to reset tags if needed
 
