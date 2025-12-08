@@ -101,6 +101,11 @@ def parse_args():
         default=1000,
         help="scale used in the filename to describe coordinates in meters (required when running with a buffer)",
     )
+    parser.add_argument(
+        "--reset_tags",
+        action="store_true",
+        help="reset tags at the beginning of the process",
+    )
 
     return parser.parse_args()
 
@@ -122,6 +127,7 @@ def preprocess_mnx(
     virtual_points_classes: int,
     tile_width: int,
     tile_coord_scale: int,
+    reset_tags: bool = False,
 ):
     """Launch preprocessing before calculating MNX
     Args:
@@ -141,6 +147,7 @@ def preprocess_mnx(
         virtual_points_classes (int):  The classification value to assign to those virtual points (default: 66).
         tile_width (int): Width of the tile in meters (default: 1000).
         tile_coord_scale (int): scale used in the filename to describe coordinates in meters (default: 1000).
+        reset_tags (bool): If set, reset tags at the beginning of the process (default: False).
     """
 
     # If no GeoJSON input is provided, we cannot add or mark points
@@ -178,6 +185,7 @@ def preprocess_mnx(
             spatial_ref=spatial_ref,
             tile_width=tile_width,
             tile_coord_scale=tile_coord_scale,
+            reset_tags=reset_tags,
         )
 
 
